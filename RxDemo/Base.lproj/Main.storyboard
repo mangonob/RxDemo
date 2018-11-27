@@ -17,12 +17,76 @@
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" keyboardDismissMode="onDrag" translatesAutoresizingMaskIntoConstraints="NO" id="QOa-NP-vhQ">
+                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LC6-bL-thZ">
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="603"/>
+                                        <subviews>
+                                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="faV-iR-vqc">
+                                                <rect key="frame" x="40" y="60" width="295" height="132"/>
+                                                <subviews>
+                                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="请输入用户名（长度在5-20之间）" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="Obv-l6-xva">
+                                                        <rect key="frame" x="0.0" y="0.0" width="295" height="30"/>
+                                                        <color key="textColor" red="0.12637259066104889" green="0.12639245390892029" blue="0.12636536359786987" alpha="1" colorSpace="calibratedRGB"/>
+                                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                        <textInputTraits key="textInputTraits"/>
+                                                    </textField>
+                                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="请输入密码（6-18位数字字母）" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="P8q-YR-uZ6">
+                                                        <rect key="frame" x="0.0" y="46" width="295" height="30"/>
+                                                        <color key="textColor" red="0.12637259066104889" green="0.12639245390892029" blue="0.12636536359786987" alpha="1" colorSpace="calibratedRGB"/>
+                                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                        <textInputTraits key="textInputTraits" secureTextEntry="YES"/>
+                                                    </textField>
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZsB-9U-l2E">
+                                                        <rect key="frame" x="0.0" y="92" width="295" height="40"/>
+                                                        <color key="backgroundColor" red="0.18198148906230927" green="0.69426733255386353" blue="0.53024792671203613" alpha="1" colorSpace="calibratedRGB"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="40" id="qzU-dn-SpK"/>
+                                                        </constraints>
+                                                        <state key="normal" title="登录">
+                                                            <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        </state>
+                                                    </button>
+                                                </subviews>
+                                            </stackView>
+                                        </subviews>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstItem="faV-iR-vqc" firstAttribute="leading" secondItem="LC6-bL-thZ" secondAttribute="leading" constant="40" id="ScF-ci-nRf"/>
+                                            <constraint firstAttribute="trailing" secondItem="faV-iR-vqc" secondAttribute="trailing" constant="40" id="q1N-Nc-gSL"/>
+                                            <constraint firstItem="faV-iR-vqc" firstAttribute="top" secondItem="LC6-bL-thZ" secondAttribute="top" constant="60" id="xMF-h3-N2f"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="LC6-bL-thZ" secondAttribute="trailing" id="3WE-jx-jmd"/>
+                                    <constraint firstItem="LC6-bL-thZ" firstAttribute="width" secondItem="QOa-NP-vhQ" secondAttribute="width" id="4Xa-Iq-DP7"/>
+                                    <constraint firstItem="LC6-bL-thZ" firstAttribute="height" secondItem="QOa-NP-vhQ" secondAttribute="height" id="JLN-cm-OGR"/>
+                                    <constraint firstItem="LC6-bL-thZ" firstAttribute="leading" secondItem="QOa-NP-vhQ" secondAttribute="leading" id="WeX-yr-gwh"/>
+                                    <constraint firstAttribute="bottom" secondItem="LC6-bL-thZ" secondAttribute="bottom" id="duY-CW-OPt"/>
+                                    <constraint firstItem="LC6-bL-thZ" firstAttribute="top" secondItem="QOa-NP-vhQ" secondAttribute="top" id="u3P-rL-eDB"/>
+                                </constraints>
+                            </scrollView>
+                        </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="QOa-NP-vhQ" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="K0c-J2-GNS"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="QOa-NP-vhQ" secondAttribute="bottom" id="RCJ-uu-CS8"/>
+                            <constraint firstItem="QOa-NP-vhQ" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="dn9-OA-FO8"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="QOa-NP-vhQ" secondAttribute="trailing" id="nTp-F3-nz2"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <navigationItem key="navigationItem" id="fmn-wj-8Jp"/>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <size key="freeformSize" width="375" height="667"/>
+                    <connections>
+                        <outlet property="confirmButton" destination="ZsB-9U-l2E" id="2Fu-TZ-s9Y"/>
+                        <outlet property="passwordTextField" destination="P8q-YR-uZ6" id="adU-CH-wzc"/>
+                        <outlet property="usernameTextField" destination="Obv-l6-xva" id="vrS-7u-uNw"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
