@@ -11,6 +11,7 @@ import RxSwift
 import RxCocoa
 import RxAlamofire
 import Alamofire
+import SwiftyJSON
 
 class LoginViewModel {
     struct Input {
@@ -22,14 +23,28 @@ class LoginViewModel {
     var loginEnable: Observable<Bool>
     var usernameValid: Observable<Bool>
     var passwordValid: Observable<Bool>
-
+    var account: Observable<RDAccount>
+    
     init(_ input: Input) {
         usernameValid = input.username.map { 5...20 ~= $0.count }
         passwordValid = input.password.map { 6...18 ~= $0.count }
-        
+
+        let isLoading = RXActivity()
+
         loginEnable = Observable.combineLatest(
             usernameValid,
-            passwordValid
-            ).map { $0.0 && $0.1 }
+            passwordValid,
+            isLoading.asObservable()
+            ).map {
+                $0.0 && $0.1 && !$0.2
+        }
+        
+        let form = Observable.combineLatest(input.username, input.password) { (username: $0, password: $1) }
+        
+        account = input.loginEvent.withLatestFrom(form)
+            .flatMapLatest {
+                RDAccount.account(withUsername: $0.username, andPassword: $0.password)
+            }
+            .trackActivity(by: isLoading)
     }
 }

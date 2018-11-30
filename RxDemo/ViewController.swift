@@ -22,7 +22,7 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view, typically from a nib.
         
         confirmButton.layer.cornerRadius = 5
-        
+
         let loginViewModel = LoginViewModel(
             .init(username: usernameTextField.rx.value.orEmpty.asObservable(),
                   password: passwordTextField.rx.value.orEmpty.asObservable(),
@@ -40,6 +40,8 @@ class ViewController: UIViewController {
         loginViewModel.loginEnable.map { $0 ? UserStatus.success : UserStatus.faild }
             .bind(to: confirmButton.rx.userStatus)
             .disposed(by: disposeBag)
+        
+        loginViewModel.account.subscribe().disposed(by: disposeBag)
     }
 }
 

@@ -1,5 +1,5 @@
 //
-//  RxActivity.swift
+//  RXActivity.swift
 //  RxDemo
 //
 //  Created by Trinity on 2018/11/29.
@@ -10,7 +10,11 @@ import Foundation
 import RxSwift
 import RxCocoa
 
-class RxActivity: NSObject, ObservableConvertibleType {
+/**
+ * Monitor sequence computation.
+ * If there is least on sequence computation in progress, `true` will be sent.
+ */
+class RXActivity: NSObject, ObservableConvertibleType {
     typealias E = Bool
 
     private var relay = BehaviorRelay(value: 0)
@@ -21,14 +25,14 @@ class RxActivity: NSObject, ObservableConvertibleType {
         isActivity = relay
             .map { $0 > 0 }
             .distinctUntilChanged()
-        
+
         super.init()
     }
     
     private func increment(){
         lock.lock()
         defer { lock.unlock() }
-        
+
         relay.accept(relay.value + 1)
     }
     
@@ -39,21 +43,21 @@ class RxActivity: NSObject, ObservableConvertibleType {
         relay.accept(relay.value - 1)
     }
     
-    func asObservable() -> Observable<RxActivity.E> {
+    func asObservable() -> Observable<RXActivity.E> {
         return isActivity
     }
     
     fileprivate func trackActivity<O: ObservableConvertibleType>(of source: O) -> Observable<O.E> {
-        return Observable.using({ () -> RxActivityToken<O.E> in
+        return Observable.using({ () -> RXActivityToken<O.E> in
             self.increment()
-            return RxActivityToken(source: source.asObservable(), disposeAction: self.increment)
+            return RXActivityToken(source: source.asObservable(), disposeAction: self.decrement)
         }, observableFactory: { token in
             return token.asObservable()
         })
     }
 }
 
-class RxActivityToken<E>: NSObject, ObservableConvertibleType, Disposable {
+class RXActivityToken<E>: NSObject, ObservableConvertibleType, Disposable {
     private var source: Observable<E>
     private var disposable: Cancelable
     
@@ -72,7 +76,7 @@ class RxActivityToken<E>: NSObject, ObservableConvertibleType, Disposable {
 }
 
 extension ObservableConvertibleType {
-    func trackActivity(by activity: RxActivity) -> Observable<E> {
+    func trackActivity(by activity: RXActivity) -> Observable<E> {
         return activity.trackActivity(of: self)
     }
 }
