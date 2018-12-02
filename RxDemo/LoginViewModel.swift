@@ -20,31 +20,32 @@ class LoginViewModel {
         var loginEvent: Observable<Void>
     }
     
-    var loginEnable: Observable<Bool>
-    var usernameValid: Observable<Bool>
-    var passwordValid: Observable<Bool>
-    var account: Observable<RDAccount>
-    
+    let loginEnable: Observable<Bool>
+    let usernameValid: Observable<Bool>
+    let passwordValid: Observable<Bool>
+    let account: Observable<RDAccount?>
+    let isLoading: RXActivity
+
     init(_ input: Input) {
         usernameValid = input.username.map { 5...20 ~= $0.count }
         passwordValid = input.password.map { 6...18 ~= $0.count }
 
         let isLoading = RXActivity()
-
+        self.isLoading = isLoading
+        
         loginEnable = Observable.combineLatest(
             usernameValid,
             passwordValid,
             isLoading.asObservable()
-            ).map {
-                $0.0 && $0.1 && !$0.2
-        }
+            ).map { $0.0 && $0.1 && !$0.2 }
+            .distinctUntilChanged()
         
         let form = Observable.combineLatest(input.username, input.password) { (username: $0, password: $1) }
-        
+
         account = input.loginEvent.withLatestFrom(form)
             .flatMapLatest {
                 RDAccount.account(withUsername: $0.username, andPassword: $0.password)
-            }
-            .trackActivity(by: isLoading)
+                    .trackActivity(by: isLoading)
+        }
     }
 }

@@ -14,6 +14,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var usernameTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var confirmButton: UIButton!
+    @IBOutlet weak var loginIndicatory: UIActivityIndicatorView!
     
     lazy var disposeBag = DisposeBag()
 
@@ -41,7 +42,30 @@ class ViewController: UIViewController {
             .bind(to: confirmButton.rx.userStatus)
             .disposed(by: disposeBag)
         
-        loginViewModel.account.subscribe().disposed(by: disposeBag)
+        loginViewModel.isLoading.asObservable()
+            .bind(to: loginIndicatory.rx.isAnimating )
+            .disposed(by: disposeBag)
+        
+        loginViewModel.isLoading.asObservable()
+            .map { $0 ? "登录中" : "登录" }
+            .bind(to: confirmButton.rx.title() )
+            .disposed(by: disposeBag)
+        
+        loginViewModel.account.subscribe(onNext: { [weak self] account in
+            guard let account = account,
+                let name = account.name,
+                let cpID = account.cpID else {
+                    let alert = UIAlertController(title: "提示", message: "登录失败", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "确定", style: .cancel, handler: nil))
+                    self?.present(alert, animated: true, completion: nil)
+                    
+                    return
+            }
+            
+            let alert = UIAlertController(title: "提示", message: "\(name): \(cpID)登录成功！", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "确定", style: .cancel, handler: nil))
+            self?.present(alert, animated: true, completion: nil)
+        }).disposed(by: disposeBag)
     }
 }
 

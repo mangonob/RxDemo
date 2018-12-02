@@ -14,6 +14,8 @@ import Foundation
 import RxAlamofire
 import Alamofire
 import RxSwift
+import RxCocoa
+import SwiftyJSON
 
 class RDAccount: Codable {
     var id: String?
@@ -72,7 +74,7 @@ class RDAccount: Codable {
         case isProxy = "isProxy"
     }
     
-    static func account(withUsername username: String, andPassword password: String) -> Observable<RDAccount> {
+    static func account(withUsername username: String, andPassword password: String) -> Observable<RDAccount?> {
         var params = [String: Any]()
         params["authType"] = "MOBILE_PHONE"
         params["u"] = username
@@ -80,6 +82,6 @@ class RDAccount: Codable {
         
         return Alamofire.request("https://uatapi.handeson.com/v2/signin_check", method: .post, parameters: params).rx
             .responseData()
-            .map{ try JSONDecoder().decode(RDAccount.self, from: $0.1) }
+            .map { try? JSONDecoder().decode(RDAccount.self, from: JSON($0.1)["data"].rawData()) }
     }
 }

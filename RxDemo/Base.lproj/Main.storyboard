@@ -39,16 +39,33 @@
                                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                         <textInputTraits key="textInputTraits" secureTextEntry="YES"/>
                                                     </textField>
-                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZsB-9U-l2E">
+                                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="d3X-eG-563">
                                                         <rect key="frame" x="0.0" y="92" width="295" height="40"/>
-                                                        <color key="backgroundColor" red="0.18198148906230927" green="0.69426733255386353" blue="0.53024792671203613" alpha="1" colorSpace="calibratedRGB"/>
+                                                        <subviews>
+                                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZsB-9U-l2E">
+                                                                <rect key="frame" x="0.0" y="0.0" width="295" height="40"/>
+                                                                <color key="backgroundColor" red="0.18198148906230927" green="0.69426733255386353" blue="0.53024792671203613" alpha="1" colorSpace="calibratedRGB"/>
+                                                                <constraints>
+                                                                    <constraint firstAttribute="height" constant="40" id="qzU-dn-SpK"/>
+                                                                </constraints>
+                                                                <state key="normal" title="登录">
+                                                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                </state>
+                                                            </button>
+                                                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="white" translatesAutoresizingMaskIntoConstraints="NO" id="C11-b3-SWK">
+                                                                <rect key="frame" x="12" y="10" width="20" height="20"/>
+                                                            </activityIndicatorView>
+                                                        </subviews>
+                                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <constraints>
-                                                            <constraint firstAttribute="height" constant="40" id="qzU-dn-SpK"/>
+                                                            <constraint firstItem="ZsB-9U-l2E" firstAttribute="top" secondItem="d3X-eG-563" secondAttribute="top" id="JrA-ma-6zt"/>
+                                                            <constraint firstItem="ZsB-9U-l2E" firstAttribute="leading" secondItem="d3X-eG-563" secondAttribute="leading" id="KpA-HJ-b3r"/>
+                                                            <constraint firstAttribute="bottom" secondItem="ZsB-9U-l2E" secondAttribute="bottom" id="R3v-KS-gFe"/>
+                                                            <constraint firstAttribute="trailing" secondItem="ZsB-9U-l2E" secondAttribute="trailing" id="R41-2M-y7w"/>
+                                                            <constraint firstItem="C11-b3-SWK" firstAttribute="leading" secondItem="d3X-eG-563" secondAttribute="leading" constant="12" id="jyg-KI-zj2"/>
+                                                            <constraint firstItem="C11-b3-SWK" firstAttribute="centerY" secondItem="d3X-eG-563" secondAttribute="centerY" id="w4V-R9-T7U"/>
                                                         </constraints>
-                                                        <state key="normal" title="登录">
-                                                            <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                        </state>
-                                                    </button>
+                                                    </view>
                                                 </subviews>
                                             </stackView>
                                         </subviews>
@@ -84,6 +101,7 @@
                     <size key="freeformSize" width="375" height="667"/>
                     <connections>
                         <outlet property="confirmButton" destination="ZsB-9U-l2E" id="2Fu-TZ-s9Y"/>
+                        <outlet property="loginIndicatory" destination="C11-b3-SWK" id="0Z4-av-ywf"/>
                         <outlet property="passwordTextField" destination="P8q-YR-uZ6" id="adU-CH-wzc"/>
                         <outlet property="usernameTextField" destination="Obv-l6-xva" id="vrS-7u-uNw"/>
                     </connections>
