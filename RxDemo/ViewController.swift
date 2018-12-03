@@ -51,20 +51,15 @@ class ViewController: UIViewController {
             .bind(to: confirmButton.rx.title() )
             .disposed(by: disposeBag)
         
-        loginViewModel.account.subscribe(onNext: { [weak self] account in
-            guard let account = account,
-                let name = account.name,
-                let cpID = account.cpID else {
-                    let alert = UIAlertController(title: "提示", message: "登录失败", preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: "确定", style: .cancel, handler: nil))
-                    self?.present(alert, animated: true, completion: nil)
-                    
-                    return
+        loginViewModel.account.subscribe(onNext: { [weak self] response in
+            switch response {
+            case .account:
+                self?.navigationController?.pushViewController(RDOrderController(), animated: true)
+            case .moreInfo(let moreInfo):
+                let alert = UIAlertController(title: "提示", message: moreInfo ?? "登录失败", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "确定", style: .cancel, handler: nil))
+                self?.present(alert, animated: true, completion: nil)
             }
-            
-            let alert = UIAlertController(title: "提示", message: "\(name): \(cpID)登录成功！", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "确定", style: .cancel, handler: nil))
-            self?.present(alert, animated: true, completion: nil)
         }).disposed(by: disposeBag)
     }
 }

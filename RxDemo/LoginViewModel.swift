@@ -23,7 +23,7 @@ class LoginViewModel {
     let loginEnable: Observable<Bool>
     let usernameValid: Observable<Bool>
     let passwordValid: Observable<Bool>
-    let account: Observable<RDAccount?>
+    let account: Observable<RDAccount.Response>
     let isLoading: RXActivity
 
     init(_ input: Input) {
@@ -39,7 +39,7 @@ class LoginViewModel {
             isLoading.asObservable()
             ).map { $0.0 && $0.1 && !$0.2 }
             .distinctUntilChanged()
-        
+
         let form = Observable.combineLatest(input.username, input.password) { (username: $0, password: $1) }
 
         account = input.loginEvent.withLatestFrom(form)

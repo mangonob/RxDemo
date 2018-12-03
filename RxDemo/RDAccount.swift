@@ -74,7 +74,12 @@ class RDAccount: Codable {
         case isProxy = "isProxy"
     }
     
-    static func account(withUsername username: String, andPassword password: String) -> Observable<RDAccount?> {
+    enum Response {
+        case account(RDAccount)
+        case moreInfo(String?)
+    }
+    
+    static func account(withUsername username: String, andPassword password: String) -> Observable<Response> {
         var params = [String: Any]()
         params["authType"] = "MOBILE_PHONE"
         params["u"] = username
@@ -82,6 +87,13 @@ class RDAccount: Codable {
         
         return Alamofire.request("https://uatapi.handeson.com/v2/signin_check", method: .post, parameters: params).rx
             .responseData()
-            .map { try? JSONDecoder().decode(RDAccount.self, from: JSON($0.1)["data"].rawData()) }
+            .map { JSON($0.1) }
+            .map({ (json) -> Response in
+                if let account = json.data.decode(ofClass: RDAccount.self) {
+                    return Response.account(account)
+                } else {
+                    return Response.moreInfo(json.moreInfo)
+                }
+            }).catchErrorJustReturn(.moreInfo(nil))
     }
 }

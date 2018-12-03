@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4A093A8E21B4D39A00C0E4C6 /* JSON+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A093A8D21B4D39A00C0E4C6 /* JSON+Model.swift */; };
+		4A093A9021B4FCA300C0E4C6 /* RDOrderController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A093A8F21B4FCA300C0E4C6 /* RDOrderController.swift */; };
+		4A093A9221B5214000C0E4C6 /* UITableView+NibLoadProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A093A9121B5214000C0E4C6 /* UITableView+NibLoadProtocol.swift */; };
+		4A093A9521B5216600C0E4C6 /* RDOrderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A093A9321B5216600C0E4C6 /* RDOrderCell.swift */; };
+		4A093A9621B5216600C0E4C6 /* RDOrderCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4A093A9421B5216600C0E4C6 /* RDOrderCell.xib */; };
+		4A093A9821B52D2500C0E4C6 /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A093A9721B52D2500C0E4C6 /* TestViewController.swift */; };
+		4A093A9A21B52D4600C0E4C6 /* UIViewController+Instance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A093A9921B52D4600C0E4C6 /* UIViewController+Instance.swift */; };
+		4A093A9C21B52D5100C0E4C6 /* TestViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4A093A9B21B52D5100C0E4C6 /* TestViewController.storyboard */; };
 		4A7EEFED21B0364300DA5A53 /* RXActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A7EEFEC21B0364300DA5A53 /* RXActivity.swift */; };
 		4A83EB8821A6AD4D0055A385 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A83EB8721A6AD4D0055A385 /* AppDelegate.swift */; };
 		4A83EB8A21A6AD4D0055A385 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A83EB8921A6AD4D0055A385 /* ViewController.swift */; };
@@ -22,6 +30,14 @@
 
 /* Begin PBXFileReference section */
 		325842750F8ED9A4A5A59CF6 /* Pods-RxDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RxDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-RxDemo/Pods-RxDemo.debug.xcconfig"; sourceTree = "<group>"; };
+		4A093A8D21B4D39A00C0E4C6 /* JSON+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JSON+Model.swift"; sourceTree = "<group>"; };
+		4A093A8F21B4FCA300C0E4C6 /* RDOrderController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RDOrderController.swift; sourceTree = "<group>"; };
+		4A093A9121B5214000C0E4C6 /* UITableView+NibLoadProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UITableView+NibLoadProtocol.swift"; sourceTree = "<group>"; };
+		4A093A9321B5216600C0E4C6 /* RDOrderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RDOrderCell.swift; sourceTree = "<group>"; };
+		4A093A9421B5216600C0E4C6 /* RDOrderCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RDOrderCell.xib; sourceTree = "<group>"; };
+		4A093A9721B52D2500C0E4C6 /* TestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
+		4A093A9921B52D4600C0E4C6 /* UIViewController+Instance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+Instance.swift"; sourceTree = "<group>"; };
+		4A093A9B21B52D5100C0E4C6 /* TestViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = TestViewController.storyboard; sourceTree = "<group>"; };
 		4A7EEFEC21B0364300DA5A53 /* RXActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RXActivity.swift; sourceTree = "<group>"; };
 		4A83EB8421A6AD4D0055A385 /* RxDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RxDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4A83EB8721A6AD4D0055A385 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -71,13 +87,21 @@
 		4A83EB8621A6AD4D0055A385 /* RxDemo */ = {
 			isa = PBXGroup;
 			children = (
+				4A093A9721B52D2500C0E4C6 /* TestViewController.swift */,
+				4A093A9B21B52D5100C0E4C6 /* TestViewController.storyboard */,
+				4A093A8F21B4FCA300C0E4C6 /* RDOrderController.swift */,
 				4AAD95EC21B0DE8100425206 /* RDAccount.swift */,
+				4A093A8D21B4D39A00C0E4C6 /* JSON+Model.swift */,
 				4A83EB8721A6AD4D0055A385 /* AppDelegate.swift */,
 				4A83EB8921A6AD4D0055A385 /* ViewController.swift */,
 				4A7EEFEC21B0364300DA5A53 /* RXActivity.swift */,
 				4A8FCF5821AD3514001E3270 /* UIControl+UserStatus.swift */,
 				4AAD961A21B0E92A00425206 /* DataRequest+SwiftyJSON.swift */,
 				4A8FCF5A21AD3968001E3270 /* LoginViewModel.swift */,
+				4A093A9321B5216600C0E4C6 /* RDOrderCell.swift */,
+				4A093A9421B5216600C0E4C6 /* RDOrderCell.xib */,
+				4A093A9921B52D4600C0E4C6 /* UIViewController+Instance.swift */,
+				4A093A9121B5214000C0E4C6 /* UITableView+NibLoadProtocol.swift */,
 				4A83EB8B21A6AD4D0055A385 /* Main.storyboard */,
 				4A83EB8E21A6AD4E0055A385 /* Assets.xcassets */,
 				4A83EB9021A6AD4E0055A385 /* LaunchScreen.storyboard */,
@@ -166,6 +190,8 @@
 			files = (
 				4A83EB9221A6AD4E0055A385 /* LaunchScreen.storyboard in Resources */,
 				4A83EB8F21A6AD4E0055A385 /* Assets.xcassets in Resources */,
+				4A093A9621B5216600C0E4C6 /* RDOrderCell.xib in Resources */,
+				4A093A9C21B52D5100C0E4C6 /* TestViewController.storyboard in Resources */,
 				4A83EB8D21A6AD4D0055A385 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -258,11 +284,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				4A8FCF5B21AD3968001E3270 /* LoginViewModel.swift in Sources */,
+				4A093A9021B4FCA300C0E4C6 /* RDOrderController.swift in Sources */,
+				4A093A8E21B4D39A00C0E4C6 /* JSON+Model.swift in Sources */,
 				4AAD961B21B0E92A00425206 /* DataRequest+SwiftyJSON.swift in Sources */,
+				4A093A9A21B52D4600C0E4C6 /* UIViewController+Instance.swift in Sources */,
+				4A093A9521B5216600C0E4C6 /* RDOrderCell.swift in Sources */,
 				4AAD95ED21B0DE8100425206 /* RDAccount.swift in Sources */,
+				4A093A9221B5214000C0E4C6 /* UITableView+NibLoadProtocol.swift in Sources */,
 				4A7EEFED21B0364300DA5A53 /* RXActivity.swift in Sources */,
 				4A8FCF5921AD3514001E3270 /* UIControl+UserStatus.swift in Sources */,
 				4A83EB8A21A6AD4D0055A385 /* ViewController.swift in Sources */,
+				4A093A9821B52D2500C0E4C6 /* TestViewController.swift in Sources */,
 				4A83EB8821A6AD4D0055A385 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
