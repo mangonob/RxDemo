@@ -15,7 +15,7 @@ import RxCocoa
 }
 
 class TestViewDelegateProxy: DelegateProxy<TestViewController, TestViewDelegate>,
-DelegateProxyType {
+DelegateProxyType, TestViewDelegate {
     public weak private(set) var testViewController: TestViewController?
     
     init(testViewController: TestViewController) {
@@ -29,7 +29,7 @@ DelegateProxyType {
 }
 
 class TestViewController: UIViewController {
-    weak var delegate: TestViewDelegate?
+    var delegate: TestViewDelegate?
 
     private lazy var disposeBag = DisposeBag()
     
@@ -37,8 +37,10 @@ class TestViewController: UIViewController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
-        rx.isSelected.subscribe(onNext: {
-            print("\(self): is selected.")
+        rx.isSelected.subscribe(onNext: { [weak self] in
+            let alert = UIAlertController(title: "提示", message: "\(self?.description ?? "") has been selected.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "确定", style: .cancel, handler: nil))
+            self?.present(alert, animated: true, completion: nil)
         }).disposed(by: disposeBag)
     }
     
@@ -64,7 +66,7 @@ extension TestViewController: HasDelegate {
 
 extension Reactive where Base: TestViewController {
     var delegate: DelegateProxy<TestViewController, TestViewDelegate> {
-        return TestViewDelegateProxy(testViewController: base)
+        return TestViewDelegateProxy.proxy(for: base)
     }
     
     var isSelected: ControlEvent<Void> {

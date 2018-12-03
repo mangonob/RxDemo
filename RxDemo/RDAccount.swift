@@ -85,7 +85,7 @@ class RDAccount: Codable {
         params["u"] = username
         params["mobilePhoneVerifyCode"] = password
         
-        return Alamofire.request("https://uatapi.handeson.com/v2/signin_check", method: .post, parameters: params).rx
+        return Alamofire.request("https://hdstest.handeson.com/v2/signin_check", method: .post, parameters: params).rx
             .responseData()
             .map { JSON($0.1) }
             .map({ (json) -> Response in

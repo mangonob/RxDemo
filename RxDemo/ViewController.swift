@@ -54,7 +54,7 @@ class ViewController: UIViewController {
         loginViewModel.account.subscribe(onNext: { [weak self] response in
             switch response {
             case .account:
-                self?.navigationController?.pushViewController(RDOrderController(), animated: true)
+                self?.navigationController?.pushViewController(TestViewController.instance(), animated: true)
             case .moreInfo(let moreInfo):
                 let alert = UIAlertController(title: "提示", message: moreInfo ?? "登录失败", preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "确定", style: .cancel, handler: nil))
