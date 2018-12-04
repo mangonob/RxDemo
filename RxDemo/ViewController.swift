@@ -64,3 +64,44 @@ class ViewController: UIViewController {
     }
 }
 
+protocol AwtensionCompatible {
+    associatedtype CompatibleType
+    
+    static var rx: Awtension<CompatibleType>.Type { get set }
+    
+    var rx: Awtension<CompatibleType> { get set }
+}
+
+extension AwtensionCompatible {
+    static var rx: Awtension<Self>.Type {
+        return Awtension<Self>.self
+    }
+    
+    var rx: Awtension<Self> {
+        return Awtension<Self>(self)
+    }
+}
+
+struct Awtension<Base> {
+    var base: Base
+    
+    init(_ base: Base) {
+        self.base = base
+    }
+}
+
+extension Awtension where Base: UIImage {
+    func resize(memorySize: Int) -> Data? {
+        return nil
+    }
+    
+    private func resize(_ size: CGSize) -> UIImage {
+        UIGraphicsBeginImageContext(size)
+        defer {
+            UIGraphicsEndImageContext()
+        }
+        
+        base.draw(in: CGRect(origin: .zero, size: base.size))
+        return UIGraphicsGetImageFromCurrentImageContext() ?? UIImage()
+    }
+}
