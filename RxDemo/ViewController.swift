@@ -67,20 +67,30 @@ class ViewController: UIViewController {
 protocol AwtensionCompatible {
     associatedtype CompatibleType
     
-    static var rx: Awtension<CompatibleType>.Type { get set }
+    static var aw: Awtension<CompatibleType>.Type { get set }
     
-    var rx: Awtension<CompatibleType> { get set }
+    var aw: Awtension<CompatibleType> { get set }
 }
 
 extension AwtensionCompatible {
-    static var rx: Awtension<Self>.Type {
-        return Awtension<Self>.self
+    static var aw: Awtension<Self>.Type {
+        get {
+            return Awtension<Self>.self
+        }
+        set {
+        }
     }
     
-    var rx: Awtension<Self> {
-        return Awtension<Self>(self)
+    var aw: Awtension<Self> {
+        get {
+            return Awtension(self)
+        }
+        set {
+        }
     }
 }
+
+extension NSObject: AwtensionCompatible { }
 
 struct Awtension<Base> {
     var base: Base
@@ -92,16 +102,41 @@ struct Awtension<Base> {
 
 extension Awtension where Base: UIImage {
     func resize(memorySize: Int) -> Data? {
-        return nil
+        var range: (min: CGFloat, max: CGFloat) = (0, 1)
+        
+        var data: Data!
+
+        repeat {
+            let mid = (range.min + range.max) / 2
+            data = Awtension.dataOfImage(base, withScale: mid)
+            if data.count > memorySize {
+                range.max = mid
+            } else {
+                range.min = mid
+            }
+        } while (range.max - range.min) > 0.01
+        
+        return Awtension.dataOfImage(base, withScale: range.min)
     }
     
-    private func resize(_ size: CGSize) -> UIImage {
+    private static func resize(image: UIImage, size: CGSize) -> UIImage {
         UIGraphicsBeginImageContext(size)
         defer {
             UIGraphicsEndImageContext()
         }
-        
-        base.draw(in: CGRect(origin: .zero, size: base.size))
+
+        image.draw(in: CGRect(origin: .zero, size: size))
         return UIGraphicsGetImageFromCurrentImageContext() ?? UIImage()
+    }
+    
+    private static func dataOfImage(_ image: UIImage, withScale scale: CGFloat) -> Data {
+        let size = CGSize(width: floor(image.size.width * scale), height: floor(image.size.height * scale))
+        
+        guard size != .zero else {
+            return Data()
+        }
+        
+        let resizedImage = Awtension.resize(image: image, size: size)
+        return UIImagePNGRepresentation(resizedImage) ?? Data()
     }
 }
