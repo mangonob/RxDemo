@@ -14,8 +14,8 @@ import RxCocoa
     @objc optional func testViewDidSelect()
 }
 
-@objc protocol TestViewDataSource {
-    @objc optional func testViewControllerTitleForButton() -> String
+protocol TestViewDataSource: class {
+    func testViewControllerTitleForButton() -> String
 }
 
 class TestViewDelegateProxy: DelegateProxy<TestViewController, TestViewDelegate>,
@@ -35,34 +35,18 @@ DelegateProxyType, TestViewDelegate {
 class TestViewDataSourceProxy: DelegateProxy<TestViewController, TestViewDataSource>,
 DelegateProxyType, TestViewDataSource {
     weak private(set) var testViewController: TestViewController?
-    
-    class EmptyTestViewDataSource: TestViewDataSource {
-        static let shared = EmptyTestViewDataSource()
-        private init() { }
-        
-        func testViewControllerTitleForButton() -> String {
-            return "Please implement yours dataSource."
-        }
-    }
-    
+
     init(testViewController: TestViewController) {
         self.testViewController = testViewController
         super.init(parentObject: testViewController, delegateProxy: TestViewDataSourceProxy.self)
     }
     
-    private weak var forwardDelegate: TestViewDataSource?
-
     static func registerKnownImplementations() {
         register { TestViewDataSourceProxy(testViewController: $0) }
     }
     
     func testViewControllerTitleForButton() -> String {
-        return (forwardDelegate ?? EmptyTestViewDataSource.shared).testViewControllerTitleForButton?() ?? ""
-    }
-    
-    override func setForwardToDelegate(_ delegate: TestViewDataSource?, retainDelegate: Bool) {
-        forwardDelegate = delegate
-        super.setForwardToDelegate(delegate, retainDelegate: retainDelegate)
+        return forwardToDelegate()?.testViewControllerTitleForButton() ?? ""
     }
 }
 
@@ -103,7 +87,7 @@ class TestViewController: UIViewController {
     }
     
     func reloadData() {
-        button.setTitle(dataSource?.testViewControllerTitleForButton?(), for: .normal)
+        button.setTitle(dataSource?.testViewControllerTitleForButton(), for: .normal)
     }
     
     /*
