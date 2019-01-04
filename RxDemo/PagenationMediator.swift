@@ -30,7 +30,31 @@ class PagenationStateInitial: PagenationState {
     static let shared = PagenationStateInitial()
 }
 
-class PagenationMediator<Element: AnyObject>: ObservableConvertibleType {
+func abscractMethod() -> Swift.Never {
+    noImplementation()
+}
+
+func noImplementation() -> Swift.Never {
+    fatalError("")
+}
+
+class ObservableFactory<Element: Any, Context: Any> {
+    func createObservable() -> Observable<Element> {
+        abscractMethod()
+    }
+    
+    func createObservable(_ context: Context) -> Observable<Element> {
+        abscractMethod()
+    }
+}
+
+class PagenationElementsFactory<Element: Any>: ObservableFactory<[Element], PagenationMediator<Element>> {
+    override func createObservable(_ context: PagenationMediator<Element>) -> Observable<[Element]> {
+        abscractMethod()
+    }
+}
+
+class PagenationMediator<Element: Any>: ObservableConvertibleType {
     typealias E = [Element]
     private var contents: Variable<[Element]>
     fileprivate var state: PagenationState
@@ -40,7 +64,7 @@ class PagenationMediator<Element: AnyObject>: ObservableConvertibleType {
         state = PagenationStateInitial.shared
     }
 
-    convenience init(reload: Signal<Void>, loadMore: Signal<Void>, elements: (PagenationMediator<Element>) -> Observable<Element>) {
+    convenience init(reload: Signal<Void>, loadMore: Signal<Void>, elementsFactory: PagenationElementsFactory<Element>) {
         self.init()
     }
     
