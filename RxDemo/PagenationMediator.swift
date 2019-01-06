@@ -1,5 +1,5 @@
 //
-//  PagenationMediator.swift
+//  Pagenation.swift
 //  RxDemo
 //
 //  Created by 高炼 on 2019/1/4.
@@ -13,8 +13,14 @@ import RxAlamofire
 import Alamofire
 
 class PagenationState {
-    func setState(_ pagenation: PagenationMediator<AnyObject>, state: PagenationState) {
+    func setState(_ pagenation: Pagenation<Any>, state: PagenationState) {
         pagenation.state = state
+    }
+    
+    func reloadData(_ pagenation: Pagenation<Any>) {
+    }
+    
+    func loadMoreData(_ pagenation: Pagenation<Any>) {
     }
 }
 
@@ -28,6 +34,9 @@ class PagenationStateNeedMoreData: PagenationState {
 
 class PagenationStateInitial: PagenationState {
     static let shared = PagenationStateInitial()
+    
+    override func loadMoreData(_ pagenation: Pagenation<Any>) {
+    }
 }
 
 func abscractMethod() -> Swift.Never {
@@ -38,37 +47,41 @@ func noImplementation() -> Swift.Never {
     fatalError("")
 }
 
-class ObservableFactory<Element: Any, Context: Any> {
-    func createObservable() -> Observable<Element> {
-        abscractMethod()
-    }
-    
-    func createObservable(_ context: Context) -> Observable<Element> {
+class PagenationElementsFactory<Element> {
+    func createObservable(_ context: Pagenation<Element>) -> Observable<[Element]> {
         abscractMethod()
     }
 }
 
-class PagenationElementsFactory<Element: Any>: ObservableFactory<[Element], PagenationMediator<Element>> {
-    override func createObservable(_ context: PagenationMediator<Element>) -> Observable<[Element]> {
-        abscractMethod()
-    }
+protocol PagenationProtocol: AnyObject {
+    associatedtype Element
+    func loadMoreData()
+    func reloadData()
 }
 
-class PagenationMediator<Element: Any>: ObservableConvertibleType {
+class Pagenation<Element: Any>: PagenationProtocol, ObservableConvertibleType, ReactiveCompatible {
     typealias E = [Element]
-    private var contents: Variable<[Element]>
+    public private(set) var contents: Variable<[Element]>
     fileprivate var state: PagenationState
-
-    private init() {
+    fileprivate var elementsFactory: PagenationElementsFactory<Element>
+    
+    init(reload: Signal<Void>, loadMore: Signal<Void>, elementsFactory: PagenationElementsFactory<Element>) {
         contents = Variable([Element]())
         state = PagenationStateInitial.shared
+        self.elementsFactory = elementsFactory
     }
-
-    convenience init(reload: Signal<Void>, loadMore: Signal<Void>, elementsFactory: PagenationElementsFactory<Element>) {
-        self.init()
+    
+    func createElementsObservable() -> Observable<[Element]> {
+        return elementsFactory.createObservable(self)
     }
     
     func asObservable() -> Observable<[Element]> {
         return contents.asObservable()
+    }
+    
+    func loadMoreData() {
+    }
+    
+    func reloadData() {
     }
 }
