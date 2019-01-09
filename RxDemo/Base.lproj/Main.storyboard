@@ -114,13 +114,13 @@
         <scene sceneID="5wQ-8H-Yuo">
             <objects>
                 <tableViewController id="hSw-Jw-6wm" customClass="TableViewController" customModule="RxDemo" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="9Ok-mS-z3N">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="9Ok-mS-z3N">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="Cell" textLabel="nDt-dv-wAc" detailTextLabel="jXf-nN-C1k" style="IBUITableViewCellStyleValue1" id="zNC-mQ-rxn">
-                                <rect key="frame" x="0.0" y="28" width="375" height="44"/>
+                                <rect key="frame" x="0.0" y="55.5" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="zNC-mQ-rxn" id="2V5-4W-6Ur">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -153,7 +153,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="N6d-hF-1zI" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1666" y="27"/>
+            <point key="canvasLocation" x="1665" y="-111"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="XdN-FJ-Rcz">
@@ -166,7 +166,7 @@
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
-                        <segue destination="hSw-Jw-6wm" kind="relationship" relationship="rootViewController" id="rLY-0W-jgQ"/>
+                        <segue destination="hSw-Jw-6wm" kind="relationship" relationship="rootViewController" id="M5n-25-BZ8"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="hzk-kM-8My" userLabel="First Responder" sceneMemberID="firstResponder"/>

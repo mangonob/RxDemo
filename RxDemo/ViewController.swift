@@ -61,5 +61,14 @@ class ViewController: UIViewController {
                 self?.present(alert, animated: true, completion: nil)
             }
         }).disposed(by: disposeBag)
+        
+        Observable<Int>.from(1..<100)
+            .scan(0, accumulator: { $0 + $1 })
+            .subscribe(onNext: { (value) in
+                print(value)
+            }, onCompleted: {
+                print("Completed")
+            })
+            .disposed(by: disposeBag)
     }
 }
