@@ -31,7 +31,7 @@ extension Reactive where Base: Mock {
     func request<E: Any>(type: E.Type) -> Observable<E> {
         return Observable<E>.create { [weak base] (subscriber) -> Disposable in
             let operation = BlockOperation(block: {
-                DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(1000), execute: {
+                DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(500), execute: {
                     if let element = base?.getElements() as? E {
                         subscriber.onNext(element)
                     }
@@ -50,10 +50,17 @@ extension Reactive where Base: Mock {
 }
 
 class PagenationState {
-    func setState<E: Any>(_ pagenation: Pagenation<E>?, state: PagenationState) {
-        pagenation?.state.value = state
+    func setState<E: Any>(_ pagenation: Pagenation<E>?, state: PagenationState?) {
+        if let state = state {
+            pagenation?.state.accept(state)
+        }
+        
+        state?.become(pagenation)
     }
     
+    func become<E>(_ pagenation: Pagenation<E>?) {
+    }
+
     func reloadData<E>(_ pagenation: Pagenation<E>) {
         setState(pagenation, state: PagenationStateReloading.shared)
         
@@ -99,12 +106,6 @@ class PagenationStateError: PagenationState {
     static let shared = PagenationStateError()
 }
 
-extension PagenationState {
-    var isReloading: Bool {
-        return self is PagenationStateReloading
-    }
-}
-
 class PagenationStateLoading: PagenationState {
     override func loadMoreData<E>(_ pagenation: Pagenation<E>) {
     }
@@ -129,24 +130,24 @@ func noImplementation() -> Swift.Never {
     fatalError()
 }
 
-class PagenationElementsFactory<Element: Equatable> {
-    func createObservable(_ context: Pagenation<Element>) -> Observable<[Element]> {
-        abscractMethod()
-    }
-}
-
 class Pagenation<Element: Equatable>: ObservableConvertibleType {
     typealias E = [Element]
     typealias State = PagenationState
-    private (set) var state = Variable<State>(PagenationStateInitial.shared)
-    private (set) var contents = Variable<E>([])
-    fileprivate var elementsFactory: PagenationElementsFactory<Element>
+    typealias ElementFactory = (Pagenation<Element>) -> Observable<[Element]>
+    
+    private (set) var state: BehaviorRelay<State>
+    private (set) var elementFactory: ElementFactory?
+    private (set) var contents = BehaviorRelay<E>(value: [])
     fileprivate var _observable: Observable<E>
     private (set) var disposeBag = DisposeBag()
+    
 
-    init(reload: Signal<Void>? = nil, loadMore: Signal<Void>? = nil, elementsFactory: PagenationElementsFactory<Element>) {
-        self.elementsFactory = elementsFactory
-
+    init(reload: Signal<Void>? = nil,
+         loadMore: Signal<Void>? = nil,
+         elementFactory: ElementFactory? = nil)
+    {
+        state  = BehaviorRelay<State>(value: PagenationStateInitial.shared)
+        self.elementFactory = elementFactory
         _observable = state.asObservable().scan(E()) { (collected, state) -> E in
             switch state {
             case is PagenationStateInitial:
@@ -158,7 +159,7 @@ class Pagenation<Element: Equatable>: ObservableConvertibleType {
             default:
                 return collected
             }
-        }.distinctUntilChanged()
+            }.distinctUntilChanged()
         
         reload?.emit(onNext: { [weak self] (_) in
             self?.loadMoreData()
@@ -167,12 +168,12 @@ class Pagenation<Element: Equatable>: ObservableConvertibleType {
         loadMore?.emit(onNext: { [weak self] (_) in
             self?.reloadData()
         }).disposed(by: disposeBag)
-
+        
         _observable.bind(to: contents).disposed(by: disposeBag)
     }
     
     func createElementsObservable() -> Observable<[Element]> {
-        return elementsFactory.createObservable(self)
+        return elementFactory?(self) ?? Observable<[Element]>.empty()
     }
     
     func asObservable() -> Observable<[Element]> {
@@ -185,5 +186,24 @@ class Pagenation<Element: Equatable>: ObservableConvertibleType {
     
     func reloadData() {
         state.value.reloadData(self)
+    }
+    
+    // MARK: - State change hook method
+    func stateInitial() {
+    }
+    
+    func stateError() {
+    }
+    
+    func stateReloading() {
+    }
+    
+    func stateLoadingMore() {
+    }
+    
+    func stateFetched(contents: [Element]) {
+    }
+    
+    func stateCompleted() {
     }
 }

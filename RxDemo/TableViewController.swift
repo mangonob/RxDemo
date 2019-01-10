@@ -12,18 +12,70 @@ import RxCocoa
 import Alamofire
 import MJRefresh
 
-class CustomElementFactory: PagenationElementsFactory<Int> {
-    lazy var mock = Mock.init { () -> [Int] in
-        return [1, 2, 3, 4]
+class TableViewPagenation<Element: Equatable>: Pagenation<Element> {
+    private (set) weak var tableView: UITableView?
+    
+    init(reload: Signal<Void>? = nil,
+         loadMore: Signal<Void>? = nil,
+         tableView: UITableView,
+         elementFactory: ElementFactory? = nil)
+    {
+        super.init(reload: reload, loadMore: loadMore, elementFactory: elementFactory)
+        self.tableView = tableView
     }
     
-    override func createObservable(_ context: Pagenation<Int>) -> Observable<[Int]> {
-        return mock.rx.request(type: [Int].self)
+    override func stateInitial() {
+        tableView?.mj_header.endRefreshing()
+        tableView?.mj_footer.resetNoMoreData()
+    }
+    
+    override func stateCompleted() {
+        tableView?.mj_header.endRefreshing()
+        tableView?.mj_footer.endRefreshingWithNoMoreData()
+    }
+    
+    override func stateError() {
+        tableView?.mj_header.endRefreshing()
+        tableView?.mj_footer.endRefreshing()
+    }
+}
+
+class CollectionViewPagenation<Element: Equatable>: Pagenation<Element> {
+    private (set) weak var collectionView: UICollectionView?
+
+    init(reload: Signal<Void>? = nil,
+         loadMore: Signal<Void>? = nil,
+         collectionView: UICollectionView,
+         elementFactory: ElementFactory? = nil)
+    {
+        super.init(reload: reload, loadMore: loadMore, elementFactory: elementFactory)
+        self.collectionView = collectionView
+    }
+    
+    override func stateInitial() {
+        collectionView?.mj_header.endRefreshing()
+        collectionView?.mj_footer.resetNoMoreData()
+    }
+    
+    override func stateCompleted() {
+        collectionView?.mj_header.endRefreshing()
+        collectionView?.mj_footer.endRefreshingWithNoMoreData()
+    }
+    
+    override func stateError() {
+        collectionView?.mj_header.endRefreshing()
+        collectionView?.mj_footer.endRefreshing()
     }
 }
 
 class TableViewController: UITableViewController {
-    fileprivate lazy var pagenation = Pagenation(elementsFactory: CustomElementFactory())
+    fileprivate lazy var pagenation = TableViewPagenation<Int>.init(tableView: tableView, elementFactory: { (pagenation) -> Observable<[Int]> in
+        var mock = Mock.init { () -> [Int] in
+            return [1, 2, 3, 4]
+        }
+        
+        return mock.rx.request(type: [Int].self)
+    })
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,8 +99,6 @@ class TableViewController: UITableViewController {
         pagenation.asObservable().asDriver(onErrorJustReturn: [])
             .drive(onNext: { [weak self] (_) in
                 self?.tableView.reloadSections(IndexSet(integer: 0), with: UITableViewRowAnimation.automatic)
-                self?.tableView.mj_header.endRefreshing()
-                self?.tableView.mj_footer.endRefreshing()
             }).disposed(by: pagenation.disposeBag)
         
         pagenation.reloadData()
