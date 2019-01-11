@@ -29,10 +29,10 @@ extension Mock: ReactiveCompatible { }
 
 extension Reactive where Base: Mock {
     func request<E: Any>(type: E.Type) -> Observable<E> {
-        return Observable<E>.create { [weak base] (subscriber) -> Disposable in
+        return Observable<E>.create { [base] (subscriber) -> Disposable in
             let operation = BlockOperation(block: {
                 DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(500), execute: {
-                    if let element = base?.getElements() as? E {
+                    if let element = base.getElements() as? E {
                         subscriber.onNext(element)
                     }
                     
@@ -51,14 +51,19 @@ extension Reactive where Base: Mock {
 
 class PagenationState {
     func setState<E: Any>(_ pagenation: Pagenation<E>?, state: PagenationState?) {
+        pagenation?.state.value.exit(pagenation)
+
         if let state = state {
             pagenation?.state.accept(state)
         }
         
-        state?.become(pagenation)
+        state?.enter(pagenation)
     }
     
-    func become<E>(_ pagenation: Pagenation<E>?) {
+    func enter<E>(_ pagenation: Pagenation<E>?) {
+    }
+    
+    func exit<E>(_ pagenation: Pagenation<E>?) {
     }
 
     func reloadData<E>(_ pagenation: Pagenation<E>) {
@@ -86,12 +91,28 @@ class PagenationState {
 class PagenationStateCompleted: PagenationState {
     static let shared = PagenationStateCompleted()
     
+    override func enter<E>(_ pagenation: Pagenation<E>?) where E : Equatable {
+        pagenation?.enterCompleted()
+    }
+    
+    override func exit<E>(_ pagenation: Pagenation<E>?) where E : Equatable {
+        pagenation?.exitCompleted()
+    }
+
     override func loadMoreData<E>(_ pagenation: Pagenation<E>) {
     }
 }
 
 class PagenationStateFetchedContents<Element>: PagenationState {
     private (set) var contents: [Element]
+    
+    override func enter<E>(_ pagenation: Pagenation<E>?) where E : Equatable {
+        pagenation?.enterFetched(contents: contents)
+    }
+    
+    override func exit<E>(_ pagenation: Pagenation<E>?) where E : Equatable {
+        pagenation?.exitFetched(contents: contents)
+    }
     
     init(_ contents: [Element]) {
         self.contents = contents
@@ -100,10 +121,26 @@ class PagenationStateFetchedContents<Element>: PagenationState {
 
 class PagenationStateInitial: PagenationState {
     static let shared = PagenationStateInitial()
+    
+    override func enter<E>(_ pagenation: Pagenation<E>?) where E : Equatable {
+        pagenation?.enterInitial()
+    }
+    
+    override func exit<E>(_ pagenation: Pagenation<E>?) where E : Equatable {
+        pagenation?.exitInitial()
+    }
 }
 
 class PagenationStateError: PagenationState {
     static let shared = PagenationStateError()
+    
+    override func enter<E>(_ pagenation: Pagenation<E>?) where E : Equatable {
+        pagenation?.enterError()
+    }
+    
+    override func exit<E>(_ pagenation: Pagenation<E>?) where E : Equatable {
+        pagenation?.exitError()
+    }
 }
 
 class PagenationStateLoading: PagenationState {
@@ -116,10 +153,26 @@ class PagenationStateLoading: PagenationState {
 
 class PagenationStateReloading: PagenationStateLoading {
     static let shared = PagenationStateReloading()
+    
+    override func enter<E>(_ pagenation: Pagenation<E>?) where E : Equatable {
+        pagenation?.enterReloading()
+    }
+    
+    override func exit<E>(_ pagenation: Pagenation<E>?) where E : Equatable {
+        pagenation?.exitReloading()
+    }
 }
 
 class PagenationStateLoadingMore: PagenationStateLoading {
     static let shared = PagenationStateLoadingMore()
+    
+    override func enter<E>(_ pagenation: Pagenation<E>?) where E : Equatable {
+        pagenation?.enterLoadingMore()
+    }
+    
+    override func exit<E>(_ pagenation: Pagenation<E>?) where E : Equatable {
+        pagenation?.exitLoadingMore()
+    }
 }
 
 func abscractMethod() -> Swift.Never {
@@ -130,21 +183,45 @@ func noImplementation() -> Swift.Never {
     fatalError()
 }
 
+class PagenationElementFactory<Element: Equatable> {
+    func createElements(_ pagenation: Pagenation<Element>) -> Observable<[Element]> {
+        return Observable<[Element]>.empty()
+    }
+}
+
+class AnonymousElementFactory<Element: Equatable>: PagenationElementFactory<Element> {
+    typealias ElementFactory = (Pagenation<Element>) -> Observable<[Element]>
+    private var elementFactory: ElementFactory
+    
+    init(_ elementFactory: @escaping ElementFactory) {
+        self.elementFactory = elementFactory
+    }
+    
+    override func createElements(_ pagenation: Pagenation<Element>) -> Observable<[Element]> {
+        return elementFactory(pagenation)
+    }
+}
+
 class Pagenation<Element: Equatable>: ObservableConvertibleType {
     typealias E = [Element]
     typealias State = PagenationState
-    typealias ElementFactory = (Pagenation<Element>) -> Observable<[Element]>
-    
+    typealias ElementFactory = AnonymousElementFactory<Element>.ElementFactory
+
     private (set) var state: BehaviorRelay<State>
-    private (set) var elementFactory: ElementFactory?
+    private var elementFactory: PagenationElementFactory<Element>
     private (set) var contents = BehaviorRelay<E>(value: [])
     fileprivate var _observable: Observable<E>
     private (set) var disposeBag = DisposeBag()
     
-
+    convenience init(reload: Signal<Void>? = nil,
+         loadMore: Signal<Void>? = nil,
+         elementFactory: @escaping ElementFactory) {
+        self.init(reload: reload, loadMore: loadMore, elementFactory: AnonymousElementFactory(elementFactory))
+    }
+    
     init(reload: Signal<Void>? = nil,
          loadMore: Signal<Void>? = nil,
-         elementFactory: ElementFactory? = nil)
+         elementFactory: PagenationElementFactory<Element> = PagenationElementFactory<Element>())
     {
         state  = BehaviorRelay<State>(value: PagenationStateInitial.shared)
         self.elementFactory = elementFactory
@@ -173,7 +250,7 @@ class Pagenation<Element: Equatable>: ObservableConvertibleType {
     }
     
     func createElementsObservable() -> Observable<[Element]> {
-        return elementFactory?(self) ?? Observable<[Element]>.empty()
+        return elementFactory.createElements(self).observeOn(MainScheduler.instance)
     }
     
     func asObservable() -> Observable<[Element]> {
@@ -189,21 +266,39 @@ class Pagenation<Element: Equatable>: ObservableConvertibleType {
     }
     
     // MARK: - State change hook method
-    func stateInitial() {
+    func enterInitial() {
     }
     
-    func stateError() {
+    func enterError() {
     }
     
-    func stateReloading() {
+    func enterReloading() {
     }
     
-    func stateLoadingMore() {
+    func enterLoadingMore() {
     }
     
-    func stateFetched(contents: [Element]) {
+    func enterFetched<E>(contents: [E]) {
     }
     
-    func stateCompleted() {
+    func enterCompleted() {
+    }
+    
+    func exitInitial() {
+    }
+    
+    func exitError() {
+    }
+    
+    func exitReloading() {
+    }
+    
+    func exitLoadingMore() {
+    }
+    
+    func exitFetched<E>(contents: [E]) {
+    }
+    
+    func exitCompleted() {
     }
 }

@@ -18,25 +18,35 @@ class TableViewPagenation<Element: Equatable>: Pagenation<Element> {
     init(reload: Signal<Void>? = nil,
          loadMore: Signal<Void>? = nil,
          tableView: UITableView,
-         elementFactory: ElementFactory? = nil)
+         elementFactory: @escaping ElementFactory)
+    {
+        super.init(reload: reload, loadMore: loadMore, elementFactory: AnonymousElementFactory(elementFactory))
+        self.tableView = tableView
+    }
+    
+    init(reload: Signal<Void>? = nil,
+         loadMore: Signal<Void>? = nil,
+         tableView: UITableView,
+         elementFactory: PagenationElementFactory<Element>)
     {
         super.init(reload: reload, loadMore: loadMore, elementFactory: elementFactory)
         self.tableView = tableView
     }
-    
-    override func stateInitial() {
-        tableView?.mj_header.endRefreshing()
+
+    override func exitCompleted() {
         tableView?.mj_footer.resetNoMoreData()
     }
-    
-    override func stateCompleted() {
+
+    override func exitReloading() {
         tableView?.mj_header.endRefreshing()
-        tableView?.mj_footer.endRefreshingWithNoMoreData()
+    }
+
+    override func exitLoadingMore() {
+        tableView?.mj_footer.endRefreshing()
     }
     
-    override func stateError() {
-        tableView?.mj_header.endRefreshing()
-        tableView?.mj_footer.endRefreshing()
+    override func enterCompleted() {
+        tableView?.mj_footer.endRefreshingWithNoMoreData()
     }
 }
 
@@ -46,32 +56,45 @@ class CollectionViewPagenation<Element: Equatable>: Pagenation<Element> {
     init(reload: Signal<Void>? = nil,
          loadMore: Signal<Void>? = nil,
          collectionView: UICollectionView,
-         elementFactory: ElementFactory? = nil)
+         elementFactory: @escaping ElementFactory)
+    {
+        super.init(reload: reload, loadMore: loadMore, elementFactory: AnonymousElementFactory(elementFactory))
+        self.collectionView = collectionView
+    }
+    
+    init(reload: Signal<Void>? = nil,
+         loadMore: Signal<Void>? = nil,
+         collectionView: UICollectionView,
+         elementFactory: PagenationElementFactory<Element>)
     {
         super.init(reload: reload, loadMore: loadMore, elementFactory: elementFactory)
         self.collectionView = collectionView
     }
     
-    override func stateInitial() {
-        collectionView?.mj_header.endRefreshing()
+    override func exitCompleted() {
         collectionView?.mj_footer.resetNoMoreData()
     }
     
-    override func stateCompleted() {
+    override func exitReloading() {
         collectionView?.mj_header.endRefreshing()
-        collectionView?.mj_footer.endRefreshingWithNoMoreData()
     }
     
-    override func stateError() {
-        collectionView?.mj_header.endRefreshing()
+    override func exitLoadingMore() {
         collectionView?.mj_footer.endRefreshing()
+    }
+    
+    override func enterCompleted() {
+        collectionView?.mj_footer.endRefreshingWithNoMoreData()
     }
 }
 
 class TableViewController: UITableViewController {
-    fileprivate lazy var pagenation = TableViewPagenation<Int>.init(tableView: tableView, elementFactory: { (pagenation) -> Observable<[Int]> in
-        var mock = Mock.init { () -> [Int] in
-            return [1, 2, 3, 4]
+    fileprivate lazy var pagenation = TableViewPagenation<Int>.init(tableView: tableView, elementFactory: { (pagenation: Pagenation<Int>) -> Observable<[Int]> in
+        let shouldCompleted = pagenation.state.value is PagenationStateLoadingMore && pagenation.contents.value.count >= 10
+        
+        let mock = Mock.init { () -> [Int] in
+            let total = arc4random() % 5 + 5
+            return shouldCompleted ? [Int]() : [Int].init(repeating: 0, count: Int(total)).map { _ in Int(arc4random() % 10 + 1) }
         }
         
         return mock.rx.request(type: [Int].self)
