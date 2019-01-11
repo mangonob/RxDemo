@@ -13,7 +13,7 @@ import Alamofire
 import MJRefresh
 
 class TableViewPagenation<Element: Equatable>: Pagenation<Element> {
-    private (set) weak var tableView: UITableView?
+    private (set) weak var tableView: UITableView!
     
     init(reload: Signal<Void>? = nil,
          loadMore: Signal<Void>? = nil,
@@ -22,6 +22,7 @@ class TableViewPagenation<Element: Equatable>: Pagenation<Element> {
     {
         super.init(reload: reload, loadMore: loadMore, elementFactory: AnonymousElementFactory(elementFactory))
         self.tableView = tableView
+        subscribeState()
     }
     
     init(reload: Signal<Void>? = nil,
@@ -31,35 +32,50 @@ class TableViewPagenation<Element: Equatable>: Pagenation<Element> {
     {
         super.init(reload: reload, loadMore: loadMore, elementFactory: elementFactory)
         self.tableView = tableView
-    }
-
-    override func exitCompleted() {
-        tableView?.mj_footer.resetNoMoreData()
-    }
-
-    override func exitReloading() {
-        tableView?.mj_header.endRefreshing()
-    }
-
-    override func exitLoadingMore() {
-        tableView?.mj_footer.endRefreshing()
+        subscribeState()
     }
     
-    override func enterCompleted() {
-        tableView?.mj_footer.endRefreshingWithNoMoreData()
-    }
-    
-    override func ignoreReload() {
-        tableView?.mj_header.endRefreshing()
-    }
-    
-    override func ignoreLoadMore() {
-        tableView?.mj_footer.endRefreshing()
+    private func subscribeState() {
+        state.filter { $0 is PagenationStateCompleted }
+            .subscribe(onNext: { [weak self] (_) in
+                self?.tableView.mj_footer.endRefreshingWithNoMoreData()
+            })
+            .disposed(by: disposeBag)
+        
+        let reloading = state.map { $0 is PagenationStateReloading }.distinctUntilChanged()
+        
+        reloading.filter { !$0 }
+            .subscribe(onNext: { [weak self] (_) in
+                self?.tableView.mj_header.endRefreshing()
+            })
+            .disposed(by: disposeBag)
+        
+        let loadingMore = state.map { $0 is PagenationStateLoadingMore }.distinctUntilChanged()
+            
+        loadingMore.filter { !$0 }
+            .subscribe(onNext: { [weak self] (_) in
+                self?.tableView.mj_footer.endRefreshing()
+            })
+            .disposed(by: disposeBag)
+        
+        tableView.mj_header.rx.refreshing.withLatestFrom(reloading)
+            .filter { !$0 }
+            .subscribe(onNext: { [weak self] (_) in
+                self?.tableView.mj_header.endRefreshing()
+            })
+            .disposed(by: disposeBag)
+        
+        tableView.mj_footer.rx.refreshing.withLatestFrom(loadingMore)
+            .filter { !$0 }
+            .subscribe(onNext: { [weak self] (_) in
+                self?.tableView.mj_footer.endRefreshing()
+            })
+            .disposed(by: disposeBag)
     }
 }
 
 class CollectionViewPagenation<Element: Equatable>: Pagenation<Element> {
-    private (set) weak var collectionView: UICollectionView?
+    private (set) weak var collectionView: UICollectionView!
 
     init(reload: Signal<Void>? = nil,
          loadMore: Signal<Void>? = nil,
@@ -68,6 +84,7 @@ class CollectionViewPagenation<Element: Equatable>: Pagenation<Element> {
     {
         super.init(reload: reload, loadMore: loadMore, elementFactory: AnonymousElementFactory(elementFactory))
         self.collectionView = collectionView
+        subscribeState()
     }
     
     init(reload: Signal<Void>? = nil,
@@ -77,22 +94,45 @@ class CollectionViewPagenation<Element: Equatable>: Pagenation<Element> {
     {
         super.init(reload: reload, loadMore: loadMore, elementFactory: elementFactory)
         self.collectionView = collectionView
+        subscribeState()
     }
     
-    override func exitCompleted() {
-        collectionView?.mj_footer.resetNoMoreData()
-    }
-    
-    override func exitReloading() {
-        collectionView?.mj_header.endRefreshing()
-    }
-    
-    override func exitLoadingMore() {
-        collectionView?.mj_footer.endRefreshing()
-    }
-    
-    override func enterCompleted() {
-        collectionView?.mj_footer.endRefreshingWithNoMoreData()
+    private func subscribeState() {
+        state.filter { $0 is PagenationStateCompleted }
+            .subscribe(onNext: { [weak self] (_) in
+                self?.collectionView.mj_footer.endRefreshingWithNoMoreData()
+            })
+            .disposed(by: disposeBag)
+        
+        let reloading = state.map { $0 is PagenationStateReloading }.distinctUntilChanged()
+        
+        reloading.filter { !$0 }
+            .subscribe(onNext: { [weak self] (_) in
+                self?.collectionView.mj_header.endRefreshing()
+            })
+            .disposed(by: disposeBag)
+        
+        let loadingMore = state.map { $0 is PagenationStateLoadingMore }.distinctUntilChanged()
+        
+        loadingMore.filter { !$0 }
+            .subscribe(onNext: { [weak self] (_) in
+                self?.collectionView.mj_footer.endRefreshing()
+            })
+            .disposed(by: disposeBag)
+        
+        collectionView.mj_header.rx.refreshing.withLatestFrom(reloading)
+            .filter { !$0 }
+            .subscribe(onNext: { [weak self] (_) in
+                self?.collectionView.mj_header.endRefreshing()
+            })
+            .disposed(by: disposeBag)
+        
+        collectionView.mj_footer.rx.refreshing.withLatestFrom(loadingMore)
+            .filter { !$0 }
+            .subscribe(onNext: { [weak self] (_) in
+                self?.collectionView.mj_footer.endRefreshing()
+            })
+            .disposed(by: disposeBag)
     }
 }
 
@@ -102,11 +142,6 @@ class TableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
         tableView.delegate = self
         tableView.dataSource = nil
         

@@ -51,21 +51,11 @@ extension Reactive where Base: Mock {
 
 class PagenationState {
     func setState<E: Any>(_ pagenation: Pagenation<E>?, state: PagenationState?) {
-        pagenation?.state.value.exit(pagenation)
-
         if let state = state {
             pagenation?.state.accept(state)
         }
-        
-        state?.enter(pagenation)
     }
     
-    func enter<E>(_ pagenation: Pagenation<E>?) {
-    }
-    
-    func exit<E>(_ pagenation: Pagenation<E>?) {
-    }
-
     func reloadData<E>(_ pagenation: Pagenation<E>) {
         setState(pagenation, state: PagenationStateReloading.shared)
         
@@ -90,31 +80,14 @@ class PagenationState {
 
 class PagenationStateCompleted: PagenationState {
     static let shared = PagenationStateCompleted()
-    
-    override func enter<E>(_ pagenation: Pagenation<E>?) where E : Equatable {
-        pagenation?.enterCompleted()
-    }
-    
-    override func exit<E>(_ pagenation: Pagenation<E>?) where E : Equatable {
-        pagenation?.exitCompleted()
-    }
 
     override func loadMoreData<E>(_ pagenation: Pagenation<E>) {
-        pagenation.ignoreLoadMore()
     }
 }
 
 class PagenationStateFetchedContents<Element>: PagenationState {
     private (set) var contents: [Element]
-    
-    override func enter<E>(_ pagenation: Pagenation<E>?) where E : Equatable {
-        pagenation?.enterFetched(contents: contents)
-    }
-    
-    override func exit<E>(_ pagenation: Pagenation<E>?) where E : Equatable {
-        pagenation?.exitFetched(contents: contents)
-    }
-    
+
     init(_ contents: [Element]) {
         self.contents = contents
     }
@@ -122,60 +95,26 @@ class PagenationStateFetchedContents<Element>: PagenationState {
 
 class PagenationStateInitial: PagenationState {
     static let shared = PagenationStateInitial()
-    
-    override func enter<E>(_ pagenation: Pagenation<E>?) where E : Equatable {
-        pagenation?.enterInitial()
-    }
-    
-    override func exit<E>(_ pagenation: Pagenation<E>?) where E : Equatable {
-        pagenation?.exitInitial()
-    }
 }
 
 class PagenationStateError: PagenationState {
     static let shared = PagenationStateError()
-    
-    override func enter<E>(_ pagenation: Pagenation<E>?) where E : Equatable {
-        pagenation?.enterError()
-    }
-    
-    override func exit<E>(_ pagenation: Pagenation<E>?) where E : Equatable {
-        pagenation?.exitError()
-    }
 }
 
 class PagenationStateLoading: PagenationState {
     override func loadMoreData<E>(_ pagenation: Pagenation<E>) {
-        pagenation.ignoreLoadMore()
     }
     
     override func reloadData<E>(_ pagenation: Pagenation<E>) {
-        pagenation.ignoreReload()
     }
 }
 
 class PagenationStateReloading: PagenationStateLoading {
     static let shared = PagenationStateReloading()
-    
-    override func enter<E>(_ pagenation: Pagenation<E>?) where E : Equatable {
-        pagenation?.enterReloading()
-    }
-    
-    override func exit<E>(_ pagenation: Pagenation<E>?) where E : Equatable {
-        pagenation?.exitReloading()
-    }
 }
 
 class PagenationStateLoadingMore: PagenationStateLoading {
     static let shared = PagenationStateLoadingMore()
-    
-    override func enter<E>(_ pagenation: Pagenation<E>?) where E : Equatable {
-        pagenation?.enterLoadingMore()
-    }
-    
-    override func exit<E>(_ pagenation: Pagenation<E>?) where E : Equatable {
-        pagenation?.exitLoadingMore()
-    }
 }
 
 func abscractMethod() -> Swift.Never {
@@ -266,48 +205,5 @@ class Pagenation<Element: Equatable>: ObservableConvertibleType {
     
     func reloadData() {
         state.value.reloadData(self)
-    }
-    
-    // MARK: - State change hook method
-    func enterInitial() {
-    }
-    
-    func enterError() {
-    }
-    
-    func enterReloading() {
-    }
-    
-    func enterLoadingMore() {
-    }
-    
-    func enterFetched<E>(contents: [E]) {
-    }
-    
-    func enterCompleted() {
-    }
-    
-    func exitInitial() {
-    }
-    
-    func exitError() {
-    }
-    
-    func exitReloading() {
-    }
-    
-    func exitLoadingMore() {
-    }
-    
-    func exitFetched<E>(contents: [E]) {
-    }
-    
-    func exitCompleted() {
-    }
-    
-    func ignoreReload() {
-    }
-    
-    func ignoreLoadMore() {
     }
 }
