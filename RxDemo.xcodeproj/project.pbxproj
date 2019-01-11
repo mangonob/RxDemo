@@ -18,6 +18,7 @@
 		4A6C27E421DF55300009C8CE /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A6C27E321DF55300009C8CE /* TableViewController.swift */; };
 		4A6C27E621DF55C60009C8CE /* Pagenation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A6C27E521DF55C60009C8CE /* Pagenation.swift */; };
 		4A7EEFED21B0364300DA5A53 /* RXActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A7EEFEC21B0364300DA5A53 /* RXActivity.swift */; };
+		4A81F78721E86DB600245F52 /* MJRefresh+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A81F78621E86DB600245F52 /* MJRefresh+Rx.swift */; };
 		4A83EB8821A6AD4D0055A385 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A83EB8721A6AD4D0055A385 /* AppDelegate.swift */; };
 		4A83EB8A21A6AD4D0055A385 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A83EB8921A6AD4D0055A385 /* ViewController.swift */; };
 		4A83EB8D21A6AD4D0055A385 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4A83EB8B21A6AD4D0055A385 /* Main.storyboard */; };
@@ -43,6 +44,7 @@
 		4A6C27E321DF55300009C8CE /* TableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
 		4A6C27E521DF55C60009C8CE /* Pagenation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pagenation.swift; sourceTree = "<group>"; };
 		4A7EEFEC21B0364300DA5A53 /* RXActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RXActivity.swift; sourceTree = "<group>"; };
+		4A81F78621E86DB600245F52 /* MJRefresh+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MJRefresh+Rx.swift"; sourceTree = "<group>"; };
 		4A83EB8421A6AD4D0055A385 /* RxDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RxDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4A83EB8721A6AD4D0055A385 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4A83EB8921A6AD4D0055A385 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -92,6 +94,7 @@
 			isa = PBXGroup;
 			children = (
 				4A6C27E521DF55C60009C8CE /* Pagenation.swift */,
+				4A81F78621E86DB600245F52 /* MJRefresh+Rx.swift */,
 				4A6C27E321DF55300009C8CE /* TableViewController.swift */,
 				4A093A9721B52D2500C0E4C6 /* TestViewController.swift */,
 				4A093A9B21B52D5100C0E4C6 /* TestViewController.storyboard */,
@@ -297,6 +300,7 @@
 				4AAD961B21B0E92A00425206 /* DataRequest+SwiftyJSON.swift in Sources */,
 				4A093A9A21B52D4600C0E4C6 /* UIViewController+Instance.swift in Sources */,
 				4A093A9521B5216600C0E4C6 /* RDOrderCell.swift in Sources */,
+				4A81F78721E86DB600245F52 /* MJRefresh+Rx.swift in Sources */,
 				4AAD95ED21B0DE8100425206 /* RDAccount.swift in Sources */,
 				4A093A9221B5214000C0E4C6 /* UITableView+NibLoadProtocol.swift in Sources */,
 				4A7EEFED21B0364300DA5A53 /* RXActivity.swift in Sources */,

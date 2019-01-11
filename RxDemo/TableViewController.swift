@@ -89,16 +89,7 @@ class CollectionViewPagenation<Element: Equatable>: Pagenation<Element> {
 }
 
 class TableViewController: UITableViewController {
-    fileprivate lazy var pagenation = TableViewPagenation<Int>.init(tableView: tableView, elementFactory: { (pagenation: Pagenation<Int>) -> Observable<[Int]> in
-        let shouldCompleted = pagenation.state.value is PagenationStateLoadingMore && pagenation.contents.value.count >= 10
-        
-        let mock = Mock.init { () -> [Int] in
-            let total = arc4random() % 5 + 5
-            return shouldCompleted ? [Int]() : [Int].init(repeating: 0, count: Int(total)).map { _ in Int(arc4random() % 10 + 1) }
-        }
-        
-        return mock.rx.request(type: [Int].self)
-    })
+    fileprivate var pagenation: TableViewPagenation<Int>!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -111,13 +102,23 @@ class TableViewController: UITableViewController {
         tableView.delegate = self
         tableView.dataSource = self
         
-        tableView.mj_header = MJRefreshNormalHeader(refreshingBlock: { [weak self] in
-            self?.pagenation.reloadData()
-        })
+        tableView.mj_header = MJRefreshNormalHeader()
+        tableView.mj_footer = MJRefreshAutoNormalFooter()
         
-        tableView.mj_footer = MJRefreshAutoNormalFooter(refreshingBlock: { [weak self] in
-            self?.pagenation.loadMoreData()
-        })
+        pagenation = TableViewPagenation<Int>
+            .init(reload: tableView.mj_header.rx.refreshing.asSignal(),
+                  loadMore: tableView.mj_footer.rx.refreshing.asSignal(),
+                  tableView: tableView,
+                  elementFactory: { (pagenation: Pagenation<Int>) -> Observable<[Int]> in
+                    let shouldCompleted = pagenation.state.value is PagenationStateLoadingMore && pagenation.contents.value.count >= 10
+                    
+                    let mock = Mock.init { () -> [Int] in
+                        let total = arc4random() % 5 + 5
+                        return shouldCompleted ? [Int]() : [Int].init(repeating: 0, count: Int(total)).map { _ in Int(arc4random() % 10 + 1) }
+                    }
+                    
+                    return mock.rx.request(type: [Int].self)
+            })
         
         pagenation.asObservable().asDriver(onErrorJustReturn: [])
             .drive(onNext: { [weak self] (_) in

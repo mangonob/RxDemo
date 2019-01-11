@@ -239,11 +239,11 @@ class Pagenation<Element: Equatable>: ObservableConvertibleType {
             }.distinctUntilChanged()
         
         reload?.emit(onNext: { [weak self] (_) in
-            self?.loadMoreData()
+            self?.reloadData()
         }).disposed(by: disposeBag)
         
         loadMore?.emit(onNext: { [weak self] (_) in
-            self?.reloadData()
+            self?.loadMoreData()
         }).disposed(by: disposeBag)
         
         _observable.bind(to: contents).disposed(by: disposeBag)
