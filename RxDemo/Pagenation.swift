@@ -100,6 +100,7 @@ class PagenationStateCompleted: PagenationState {
     }
 
     override func loadMoreData<E>(_ pagenation: Pagenation<E>) {
+        pagenation.ignoreLoadMore()
     }
 }
 
@@ -145,9 +146,11 @@ class PagenationStateError: PagenationState {
 
 class PagenationStateLoading: PagenationState {
     override func loadMoreData<E>(_ pagenation: Pagenation<E>) {
+        pagenation.ignoreLoadMore()
     }
     
     override func reloadData<E>(_ pagenation: Pagenation<E>) {
+        pagenation.ignoreReload()
     }
 }
 
@@ -300,5 +303,11 @@ class Pagenation<Element: Equatable>: ObservableConvertibleType {
     }
     
     func exitCompleted() {
+    }
+    
+    func ignoreReload() {
+    }
+    
+    func ignoreLoadMore() {
     }
 }

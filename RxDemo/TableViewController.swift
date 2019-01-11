@@ -48,6 +48,14 @@ class TableViewPagenation<Element: Equatable>: Pagenation<Element> {
     override func enterCompleted() {
         tableView?.mj_footer.endRefreshingWithNoMoreData()
     }
+    
+    override func ignoreReload() {
+        tableView?.mj_header.endRefreshing()
+    }
+    
+    override func ignoreLoadMore() {
+        tableView?.mj_footer.endRefreshing()
+    }
 }
 
 class CollectionViewPagenation<Element: Equatable>: Pagenation<Element> {
