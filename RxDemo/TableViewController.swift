@@ -100,7 +100,7 @@ class TableViewController: UITableViewController {
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
         tableView.delegate = self
-        tableView.dataSource = self
+        tableView.dataSource = nil
         
         tableView.mj_header = MJRefreshNormalHeader()
         tableView.mj_footer = MJRefreshAutoNormalFooter()
@@ -121,15 +121,12 @@ class TableViewController: UITableViewController {
             })
         
         pagenation.asObservable().asDriver(onErrorJustReturn: [])
-            .drive(onNext: { [weak self] (_) in
-                self?.tableView.reloadSections(IndexSet(integer: 0), with: UITableViewRowAnimation.automatic)
+            .drive(tableView.rx.items(cellIdentifier: "Cell"), curriedArgument: { row, value, cell in
+                cell.textLabel?.text = row.description
+                cell.detailTextLabel?.text = value.description
             }).disposed(by: pagenation.disposeBag)
         
         pagenation.reloadData()
-    }
-    
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
     }
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
@@ -138,15 +135,5 @@ class TableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return 0.0001
-    }
-    
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return pagenation.contents.value.count
-    }
-    
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
-        cell.textLabel?.text = pagenation.contents.value[indexPath.row].description
-        return cell
     }
 }
