@@ -36,12 +36,6 @@ class TableViewPagenation<Element: Equatable>: Pagenation<Element> {
     }
     
     private func subscribeState() {
-        state.filter { $0 is PagenationStateCompleted }
-            .subscribe(onNext: { [weak self] (_) in
-                self?.tableView.mj_footer.endRefreshingWithNoMoreData()
-            })
-            .disposed(by: disposeBag)
-        
         let reloading = state.map { $0 is PagenationStateReloading }.distinctUntilChanged()
         
         reloading.filter { !$0 }
@@ -58,17 +52,29 @@ class TableViewPagenation<Element: Equatable>: Pagenation<Element> {
             })
             .disposed(by: disposeBag)
         
-        tableView.mj_header.rx.refreshing.withLatestFrom(reloading)
-            .filter { !$0 }
+        tableView.mj_header.rx.refreshing.withLatestFrom(loadingMore)
+            .filter { $0 }
             .subscribe(onNext: { [weak self] (_) in
                 self?.tableView.mj_header.endRefreshing()
             })
             .disposed(by: disposeBag)
         
-        tableView.mj_footer.rx.refreshing.withLatestFrom(loadingMore)
-            .filter { !$0 }
+        tableView.mj_footer.rx.refreshing.withLatestFrom(reloading)
+            .filter { $0 }
             .subscribe(onNext: { [weak self] (_) in
                 self?.tableView.mj_footer.endRefreshing()
+            })
+            .disposed(by: disposeBag)
+        
+        state.filter { $0 is PagenationStateCompleted }
+            .subscribe(onNext: { [weak self] (_) in
+                self?.tableView.mj_footer.endRefreshingWithNoMoreData()
+            })
+            .disposed(by: disposeBag)
+        
+        state.filter { $0 is PagenationStateInitial }
+            .subscribe(onNext: { (state) in
+                self.tableView.mj_footer.resetNoMoreData()
             })
             .disposed(by: disposeBag)
     }
@@ -98,12 +104,6 @@ class CollectionViewPagenation<Element: Equatable>: Pagenation<Element> {
     }
     
     private func subscribeState() {
-        state.filter { $0 is PagenationStateCompleted }
-            .subscribe(onNext: { [weak self] (_) in
-                self?.collectionView.mj_footer.endRefreshingWithNoMoreData()
-            })
-            .disposed(by: disposeBag)
-        
         let reloading = state.map { $0 is PagenationStateReloading }.distinctUntilChanged()
         
         reloading.filter { !$0 }
@@ -120,17 +120,29 @@ class CollectionViewPagenation<Element: Equatable>: Pagenation<Element> {
             })
             .disposed(by: disposeBag)
         
-        collectionView.mj_header.rx.refreshing.withLatestFrom(reloading)
-            .filter { !$0 }
+        collectionView.mj_header.rx.refreshing.withLatestFrom(loadingMore)
+            .filter { $0 }
             .subscribe(onNext: { [weak self] (_) in
                 self?.collectionView.mj_header.endRefreshing()
             })
             .disposed(by: disposeBag)
         
-        collectionView.mj_footer.rx.refreshing.withLatestFrom(loadingMore)
-            .filter { !$0 }
+        collectionView.mj_footer.rx.refreshing.withLatestFrom(reloading)
+            .filter { $0 }
             .subscribe(onNext: { [weak self] (_) in
                 self?.collectionView.mj_footer.endRefreshing()
+            })
+            .disposed(by: disposeBag)
+        
+        state.filter { $0 is PagenationStateCompleted }
+            .subscribe(onNext: { [weak self] (_) in
+                self?.collectionView.mj_footer.endRefreshingWithNoMoreData()
+            })
+            .disposed(by: disposeBag)
+        
+        state.filter { $0 is PagenationStateInitial }
+            .subscribe(onNext: { (state) in
+                self.collectionView.mj_footer.resetNoMoreData()
             })
             .disposed(by: disposeBag)
     }
