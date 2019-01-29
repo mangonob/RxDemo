@@ -28,6 +28,8 @@
 		4A8FCF5B21AD3968001E3270 /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A8FCF5A21AD3968001E3270 /* LoginViewModel.swift */; };
 		4AAD95ED21B0DE8100425206 /* RDAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AAD95EC21B0DE8100425206 /* RDAccount.swift */; };
 		4AAD961B21B0E92A00425206 /* DataRequest+SwiftyJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AAD961A21B0E92A00425206 /* DataRequest+SwiftyJSON.swift */; };
+		4AFECDA5220044FD009129F0 /* SecureController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4AFECDA4220044FD009129F0 /* SecureController.storyboard */; };
+		4AFECDA722004510009129F0 /* SecureController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AFECDA622004510009129F0 /* SecureController.swift */; };
 		A1772A31334F2D76EF8F55DC /* Pods_RxDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F399A670B7B20A0C9F014187 /* Pods_RxDemo.framework */; };
 /* End PBXBuildFile section */
 
@@ -56,6 +58,8 @@
 		4A8FCF5A21AD3968001E3270 /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
 		4AAD95EC21B0DE8100425206 /* RDAccount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RDAccount.swift; sourceTree = "<group>"; };
 		4AAD961A21B0E92A00425206 /* DataRequest+SwiftyJSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DataRequest+SwiftyJSON.swift"; sourceTree = "<group>"; };
+		4AFECDA4220044FD009129F0 /* SecureController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = SecureController.storyboard; sourceTree = "<group>"; };
+		4AFECDA622004510009129F0 /* SecureController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureController.swift; sourceTree = "<group>"; };
 		8DC7BB09DAD27029C68D9BEA /* Pods-RxDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RxDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-RxDemo/Pods-RxDemo.release.xcconfig"; sourceTree = "<group>"; };
 		F399A670B7B20A0C9F014187 /* Pods_RxDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RxDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -111,6 +115,8 @@
 				4A093A9421B5216600C0E4C6 /* RDOrderCell.xib */,
 				4A093A9921B52D4600C0E4C6 /* UIViewController+Instance.swift */,
 				4A093A9121B5214000C0E4C6 /* UITableView+NibLoadProtocol.swift */,
+				4AFECDA622004510009129F0 /* SecureController.swift */,
+				4AFECDA4220044FD009129F0 /* SecureController.storyboard */,
 				4A83EB8B21A6AD4D0055A385 /* Main.storyboard */,
 				4A83EB8E21A6AD4E0055A385 /* Assets.xcassets */,
 				4A83EB9021A6AD4E0055A385 /* LaunchScreen.storyboard */,
@@ -149,6 +155,7 @@
 				4A83EB8221A6AD4D0055A385 /* Resources */,
 				4CC7D61EA11C88889A730C55 /* [CP] Embed Pods Frameworks */,
 				22EE83AE9F4E892015C570C3 /* [CP] Copy Pods Resources */,
+				4AF8652B220049EE00EB8AA9 /* Integrate Reveal Server */,
 			);
 			buildRules = (
 			);
@@ -202,6 +209,7 @@
 				4A093A9621B5216600C0E4C6 /* RDOrderCell.xib in Resources */,
 				4A093A9C21B52D5100C0E4C6 /* TestViewController.storyboard in Resources */,
 				4A83EB8D21A6AD4D0055A385 /* Main.storyboard in Resources */,
+				4AFECDA5220044FD009129F0 /* SecureController.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -222,6 +230,24 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-RxDemo/Pods-RxDemo-resources.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		4AF8652B220049EE00EB8AA9 /* Integrate Reveal Server */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Integrate Reveal Server";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "REVEAL_APP_PATH=$(mdfind kMDItemCFBundleIdentifier=\"com.ittybittyapps.Reveal2\" | head -n 1)\nBUILD_SCRIPT_PATH=\"${REVEAL_APP_PATH}/Contents/SharedSupport/Scripts/reveal_server_build_phase.sh\"\nif [ \"${REVEAL_APP_PATH}\" -a -e \"${BUILD_SCRIPT_PATH}\" ]; then\n\"${BUILD_SCRIPT_PATH}\"\nelse\necho \"Reveal Server not loaded: Cannot find a compatible Reveal app.\"\nfi\n";
 		};
 		4CC7D61EA11C88889A730C55 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -303,6 +329,7 @@
 				4A81F78721E86DB600245F52 /* MJRefresh+Rx.swift in Sources */,
 				4AAD95ED21B0DE8100425206 /* RDAccount.swift in Sources */,
 				4A093A9221B5214000C0E4C6 /* UITableView+NibLoadProtocol.swift in Sources */,
+				4AFECDA722004510009129F0 /* SecureController.swift in Sources */,
 				4A7EEFED21B0364300DA5A53 /* RXActivity.swift in Sources */,
 				4A8FCF5921AD3514001E3270 /* UIControl+UserStatus.swift in Sources */,
 				4A83EB8A21A6AD4D0055A385 /* ViewController.swift in Sources */,

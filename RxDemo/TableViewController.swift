@@ -12,176 +12,83 @@ import RxCocoa
 import Alamofire
 import MJRefresh
 
+enum RuntimeError: Error {
+    case loadError(String?)
+}
+
 class TableViewPagenation<Element: Equatable>: Pagenation<Element> {
     private (set) weak var tableView: UITableView!
     
-    init(reload: Signal<Void>? = nil,
-         loadMore: Signal<Void>? = nil,
-         tableView: UITableView,
-         elementFactory: @escaping ElementFactory)
-    {
-        super.init(reload: reload, loadMore: loadMore, elementFactory: AnonymousElementFactory(elementFactory))
+    init(_ tableView: UITableView) {
         self.tableView = tableView
-        subscribeState()
-    }
-    
-    init(reload: Signal<Void>? = nil,
-         loadMore: Signal<Void>? = nil,
-         tableView: UITableView,
-         elementFactory: PagenationElementFactory<Element>)
-    {
-        super.init(reload: reload, loadMore: loadMore, elementFactory: elementFactory)
-        self.tableView = tableView
-        subscribeState()
-    }
-    
-    private func subscribeState() {
-        let reloading = state.map { $0 is PagenationStateReloading }.distinctUntilChanged()
-        
-        reloading.filter { !$0 }
-            .subscribe(onNext: { [weak self] (_) in
-                self?.tableView.mj_header.endRefreshing()
-            })
-            .disposed(by: disposeBag)
-        
-        let loadingMore = state.map { $0 is PagenationStateLoadingMore }.distinctUntilChanged()
-            
-        loadingMore.filter { !$0 }
-            .subscribe(onNext: { [weak self] (_) in
-                self?.tableView.mj_footer.endRefreshing()
-            })
-            .disposed(by: disposeBag)
-        
-        tableView.mj_header.rx.refreshing.withLatestFrom(loadingMore)
-            .filter { $0 }
-            .subscribe(onNext: { [weak self] (_) in
-                self?.tableView.mj_header.endRefreshing()
-            })
-            .disposed(by: disposeBag)
-        
-        tableView.mj_footer.rx.refreshing.withLatestFrom(reloading)
-            .filter { $0 }
-            .subscribe(onNext: { [weak self] (_) in
-                self?.tableView.mj_footer.endRefreshing()
-            })
-            .disposed(by: disposeBag)
-        
-        state.filter { $0 is PagenationStateCompleted }
-            .subscribe(onNext: { [weak self] (_) in
-                self?.tableView.mj_footer.endRefreshingWithNoMoreData()
-            })
-            .disposed(by: disposeBag)
-        
-        state.filter { $0 is PagenationStateInitial }
-            .subscribe(onNext: { (state) in
-                self.tableView.mj_footer.resetNoMoreData()
-            })
-            .disposed(by: disposeBag)
     }
 }
 
 class CollectionViewPagenation<Element: Equatable>: Pagenation<Element> {
     private (set) weak var collectionView: UICollectionView!
-
-    init(reload: Signal<Void>? = nil,
-         loadMore: Signal<Void>? = nil,
-         collectionView: UICollectionView,
-         elementFactory: @escaping ElementFactory)
-    {
-        super.init(reload: reload, loadMore: loadMore, elementFactory: AnonymousElementFactory(elementFactory))
-        self.collectionView = collectionView
-        subscribeState()
-    }
     
-    init(reload: Signal<Void>? = nil,
-         loadMore: Signal<Void>? = nil,
-         collectionView: UICollectionView,
-         elementFactory: PagenationElementFactory<Element>)
-    {
-        super.init(reload: reload, loadMore: loadMore, elementFactory: elementFactory)
+    init(_ collectionView: UICollectionView) {
         self.collectionView = collectionView
-        subscribeState()
-    }
-    
-    private func subscribeState() {
-        let reloading = state.map { $0 is PagenationStateReloading }.distinctUntilChanged()
-        
-        reloading.filter { !$0 }
-            .subscribe(onNext: { [weak self] (_) in
-                self?.collectionView.mj_header.endRefreshing()
-            })
-            .disposed(by: disposeBag)
-        
-        let loadingMore = state.map { $0 is PagenationStateLoadingMore }.distinctUntilChanged()
-        
-        loadingMore.filter { !$0 }
-            .subscribe(onNext: { [weak self] (_) in
-                self?.collectionView.mj_footer.endRefreshing()
-            })
-            .disposed(by: disposeBag)
-        
-        collectionView.mj_header.rx.refreshing.withLatestFrom(loadingMore)
-            .filter { $0 }
-            .subscribe(onNext: { [weak self] (_) in
-                self?.collectionView.mj_header.endRefreshing()
-            })
-            .disposed(by: disposeBag)
-        
-        collectionView.mj_footer.rx.refreshing.withLatestFrom(reloading)
-            .filter { $0 }
-            .subscribe(onNext: { [weak self] (_) in
-                self?.collectionView.mj_footer.endRefreshing()
-            })
-            .disposed(by: disposeBag)
-        
-        state.filter { $0 is PagenationStateCompleted }
-            .subscribe(onNext: { [weak self] (_) in
-                self?.collectionView.mj_footer.endRefreshingWithNoMoreData()
-            })
-            .disposed(by: disposeBag)
-        
-        state.filter { $0 is PagenationStateInitial }
-            .subscribe(onNext: { (state) in
-                self.collectionView.mj_footer.resetNoMoreData()
-            })
-            .disposed(by: disposeBag)
     }
 }
 
 class TableViewController: UITableViewController {
-    fileprivate var pagenation: TableViewPagenation<Int>!
+    @IBOutlet weak var errorLabel: UITextField!
+    @IBOutlet weak var contentsLabel: UITextField!
+    
+    fileprivate lazy var pagenation = TableViewPagenation<Int>.init(self.tableView)
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        tableView.delegate = self
-        tableView.dataSource = nil
-        
-        tableView.mj_header = MJRefreshNormalHeader()
-        tableView.mj_footer = MJRefreshAutoNormalFooter()
-        
-        pagenation = TableViewPagenation<Int>
-            .init(reload: tableView.mj_header.rx.refreshing.asSignal(),
-                  loadMore: tableView.mj_footer.rx.refreshing.asSignal(),
-                  tableView: tableView,
-                  elementFactory: { (pagenation: Pagenation<Int>) -> Observable<[Int]> in
-                    let shouldCompleted = pagenation.state.value is PagenationStateLoadingMore && pagenation.contents.value.count >= 10
+        tableView.mj_header = MJRefreshNormalHeader(refreshingBlock: { [weak self] in
+            guard !(self?.pagenation.state is PagenationStateLoading) else {
+                self?.tableView.mj_header.endRefreshing()
+                return
+            }
+            
+            self?.pagenation.reloadData({ (completion) in
+                DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(800), execute: {
+                    self?.tableView.mj_header.endRefreshing()
                     
-                    let mock = Mock.init { () -> [Int] in
-                        let total = arc4random() % 5 + 5
-                        return shouldCompleted ? [Int]() : [Int].init(repeating: 0, count: Int(total)).map { _ in Int(arc4random() % 10 + 1) }
+                    if let errorDescription = self?.errorLabel.text,
+                        !errorDescription.isEmpty {
+                        completion(RuntimeError.loadError(errorDescription), nil)
+                        return
+                    }
+
+                    let contentsDescription = self?.contentsLabel.text
+                    let contents = contentsDescription?.split(separator: ".").compactMap { Int($0) } ?? []
+                    completion(nil, contents)
+                    self?.tableView.reloadData()
+                })
+            })
+        })
+        
+        tableView.mj_footer = MJRefreshAutoNormalFooter(refreshingBlock: { [weak self] in
+            guard !(self?.pagenation.state is PagenationStateLoading ||
+                self?.pagenation.state is PagenationStateCompleted) else {
+                self?.tableView.mj_footer.endRefreshing()
+                return
+            }
+            
+            self?.pagenation.loadMoreData({ (completion) in
+                DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(800), execute: {
+                    self?.tableView.mj_footer.endRefreshing()
+                    
+                    if let errorDescription = self?.errorLabel.text,
+                        !errorDescription.isEmpty {
+                        completion(RuntimeError.loadError(errorDescription), nil)
+                        return
                     }
                     
-                    return mock.rx.request(type: [Int].self)
+                    let contentsDescription = self?.contentsLabel.text
+                    let contents = contentsDescription?.split(separator: ".").compactMap { Int($0) } ?? []
+                    completion(nil, contents)
+                    self?.tableView.reloadData()
+                })
             })
-        
-        pagenation.asObservable().asDriver(onErrorJustReturn: [])
-            .drive(tableView.rx.items(cellIdentifier: "Cell"), curriedArgument: { row, value, cell in
-                cell.textLabel?.text = row.description
-                cell.detailTextLabel?.text = value.description
-            }).disposed(by: pagenation.disposeBag)
-        
-        pagenation.reloadData()
+        })
     }
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
@@ -190,5 +97,20 @@ class TableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return 0.0001
+    }
+    
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return pagenation.contents.count
+    }
+    
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        cell.detailTextLabel?.text = pagenation.contents[indexPath.row].description
+        cell.textLabel?.text = indexPath.row.description
+        return cell
     }
 }

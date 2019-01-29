@@ -12,76 +12,60 @@ import RxCocoa
 import RxAlamofire
 import Alamofire
 
-class Mock {
-    typealias ElementFactory = () -> Any
-    private var factory: ElementFactory
-    
-    init(_ factory: @escaping ElementFactory) {
-        self.factory = factory
-    }
-    
-    func getElements() -> Any {
-        return factory()
-    }
-}
-
-extension Mock: ReactiveCompatible { }
-
-extension Reactive where Base: Mock {
-    func request<E: Any>(type: E.Type) -> Observable<E> {
-        return Observable<E>.create { [base] (subscriber) -> Disposable in
-            let operation = BlockOperation(block: {
-                DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(500), execute: {
-                    if let element = base.getElements() as? E {
-                        subscriber.onNext(element)
-                    }
-                    
-                    subscriber.onCompleted()
-                })
-            })
-            
-            operation.start()
-            
-            return Disposables.create {
-                operation.cancel()
-            }
-        }
-    }
-}
-
-class PagenationState {
-    func setState<E: Any>(_ pagenation: Pagenation<E>?, state: PagenationState?) {
-        if let state = state {
-            pagenation?.state.accept(state)
-        }
-    }
-    
-    func reloadData<E>(_ pagenation: Pagenation<E>) {
-        setState(pagenation, state: PagenationStateReloading.shared)
+class PagenationState: NSObject {
+    func setState<E: Any>(_ pagenation: Pagenation<E>, state: PagenationState) {
+        pagenation.state = state
         
-        pagenation.createElementsObservable().subscribe(onNext: { [weak pagenation] (contents) in
-            self.setState(pagenation, state: PagenationStateInitial.shared)
-            self.setState(pagenation, state: contents.isEmpty ? PagenationStateCompleted.shared : PagenationStateFetchedContents(contents))
-            }, onError: { [weak pagenation] (_) in
-                self.setState(pagenation, state: PagenationStateError.shared)
-        }).disposed(by: pagenation.disposeBag)
+        switch state {
+        case is PagenationStateInitial:
+            pagenation.contents.removeAll()
+        case let state as PagenationStateFetchedContents<E>:
+            pagenation.contents.append(contentsOf: state.contents)
+        default:
+            break
+        }
     }
     
-    func loadMoreData<E>(_ pagenation: Pagenation<E>) {
+    func reloadData<E>(_ pagenation: Pagenation<E>, _ loader: Pagenation<E>.ElementLoader) {
+        setState(pagenation, state: PagenationStateReloading.shared)
+
+        loader { (error, elements) in
+            if let error = error {
+                self.setState(pagenation, state: PagenationStateError(error))
+                return
+            }
+            
+            guard let elements = elements else {
+                return
+            }
+            
+            self.setState(pagenation, state: PagenationStateInitial.shared)
+            self.setState(pagenation, state: PagenationStateFetchedContents(elements))
+        }
+    }
+    
+    func loadMoreData<E>(_ pagenation: Pagenation<E>, _ loader: Pagenation<E>.ElementLoader) {
         setState(pagenation, state: PagenationStateLoadingMore.shared)
         
-        pagenation.createElementsObservable().subscribe(onNext: { [weak pagenation] (contents) in
-            self.setState(pagenation, state: contents.isEmpty ? PagenationStateCompleted.shared : PagenationStateFetchedContents(contents))
-            }, onError: { [weak pagenation] (_) in
-                self.setState(pagenation, state: PagenationStateError.shared)
-        }).disposed(by: pagenation.disposeBag)
+        loader { (error, elements) in
+            if let error = error {
+                self.setState(pagenation, state: PagenationStateError(error))
+                return
+            }
+            
+            guard let elements = elements else {
+                return
+            }
+            
+            self.setState(pagenation, state: elements.isEmpty ? PagenationStateCompleted.shared : PagenationStateFetchedContents(elements))
+        }
     }
 }
 
 class PagenationStateCompleted: PagenationState {
     static let shared = PagenationStateCompleted()
 
-    override func loadMoreData<E>(_ pagenation: Pagenation<E>) {
+    override func loadMoreData<E>(_ pagenation: Pagenation<E>, _ loader: Pagenation<E>.ElementLoader) {
     }
 }
 
@@ -98,14 +82,18 @@ class PagenationStateInitial: PagenationState {
 }
 
 class PagenationStateError: PagenationState {
-    static let shared = PagenationStateError()
+    private (set) var error: Error
+    
+    init(_ error: Error) {
+        self.error = error
+    }
 }
 
 class PagenationStateLoading: PagenationState {
-    override func loadMoreData<E>(_ pagenation: Pagenation<E>) {
+    override func loadMoreData<E>(_ pagenation: Pagenation<E>, _ loader: Pagenation<E>.ElementLoader) {
     }
     
-    override func reloadData<E>(_ pagenation: Pagenation<E>) {
+    override func reloadData<E>(_ pagenation: Pagenation<E>, _ loader: Pagenation<E>.ElementLoader) {
     }
 }
 
@@ -118,92 +106,20 @@ class PagenationStateLoadingMore: PagenationStateLoading {
 }
 
 func abscractMethod() -> Swift.Never {
-    noImplementation()
+    fatalError("Can't invoke an abscract method.")
 }
 
-func noImplementation() -> Swift.Never {
-    fatalError()
-}
+class Pagenation<Element>: NSObject {
+    fileprivate (set) var contents = [Element]()
+    @objc dynamic var state: PagenationState = PagenationStateInitial.shared
+    typealias CompletionHandler = (Error?, [Element]?) -> Void
+    typealias ElementLoader = (@escaping CompletionHandler) -> Void
 
-class PagenationElementFactory<Element: Equatable> {
-    func createElements(_ pagenation: Pagenation<Element>) -> Observable<[Element]> {
-        return Observable<[Element]>.empty()
-    }
-}
-
-class AnonymousElementFactory<Element: Equatable>: PagenationElementFactory<Element> {
-    typealias ElementFactory = (Pagenation<Element>) -> Observable<[Element]>
-    private var elementFactory: ElementFactory
-    
-    init(_ elementFactory: @escaping ElementFactory) {
-        self.elementFactory = elementFactory
+    func reloadData(_ loader: ElementLoader) {
+        state.reloadData(self, loader)
     }
     
-    override func createElements(_ pagenation: Pagenation<Element>) -> Observable<[Element]> {
-        return elementFactory(pagenation)
-    }
-}
-
-class Pagenation<Element: Equatable>: ObservableConvertibleType {
-    typealias E = [Element]
-    typealias State = PagenationState
-    typealias ElementFactory = AnonymousElementFactory<Element>.ElementFactory
-
-    private (set) var state: BehaviorRelay<State>
-    private var elementFactory: PagenationElementFactory<Element>
-    private (set) var contents = BehaviorRelay<E>(value: [])
-    fileprivate var _observable: Observable<E>
-    private (set) var disposeBag = DisposeBag()
-    
-    convenience init(reload: Signal<Void>? = nil,
-         loadMore: Signal<Void>? = nil,
-         elementFactory: @escaping ElementFactory) {
-        self.init(reload: reload, loadMore: loadMore, elementFactory: AnonymousElementFactory(elementFactory))
-    }
-    
-    init(reload: Signal<Void>? = nil,
-         loadMore: Signal<Void>? = nil,
-         elementFactory: PagenationElementFactory<Element> = PagenationElementFactory<Element>())
-    {
-        state  = BehaviorRelay<State>(value: PagenationStateInitial.shared)
-        self.elementFactory = elementFactory
-        _observable = state.asObservable().scan(E()) { (collected, state) -> E in
-            switch state {
-            case is PagenationStateInitial:
-                return E()
-            case is PagenationStateCompleted:
-                return collected
-            case let state as PagenationStateFetchedContents<Element>:
-                return collected + state.contents
-            default:
-                return collected
-            }
-            }.distinctUntilChanged()
-        
-        reload?.emit(onNext: { [weak self] (_) in
-            self?.reloadData()
-        }).disposed(by: disposeBag)
-        
-        loadMore?.emit(onNext: { [weak self] (_) in
-            self?.loadMoreData()
-        }).disposed(by: disposeBag)
-        
-        _observable.bind(to: contents).disposed(by: disposeBag)
-    }
-    
-    func createElementsObservable() -> Observable<[Element]> {
-        return elementFactory.createElements(self).observeOn(MainScheduler.instance)
-    }
-    
-    func asObservable() -> Observable<[Element]> {
-        return _observable
-    }
-
-    func loadMoreData() {
-        state.value.loadMoreData(self)
-    }
-    
-    func reloadData() {
-        state.value.reloadData(self)
+    func loadMoreData(_ loader: ElementLoader) {
+        state.loadMoreData(self, loader)
     }
 }
