@@ -7,15 +7,9 @@
 //
 
 import Foundation
-import RxSwift
-import RxCocoa
-import RxAlamofire
-import Alamofire
 
 class PagenationState: NSObject {
     func setState<E: Any>(_ pagenation: Pagenation<E>, state: PagenationState) {
-        pagenation.state = state
-        
         switch state {
         case is PagenationStateInitial:
             pagenation.contents.removeAll()
@@ -24,6 +18,8 @@ class PagenationState: NSObject {
         default:
             break
         }
+        
+        pagenation.state = state
     }
     
     func reloadData<E>(_ pagenation: Pagenation<E>, _ loader: Pagenation<E>.ElementLoader) {
@@ -40,7 +36,7 @@ class PagenationState: NSObject {
             }
             
             self.setState(pagenation, state: PagenationStateInitial.shared)
-            self.setState(pagenation, state: PagenationStateFetchedContents(elements))
+            self.setState(pagenation, state: elements.isEmpty ? PagenationStateCompleted.shared : PagenationStateFetchedContents(elements))
         }
     }
     
@@ -105,21 +101,36 @@ class PagenationStateLoadingMore: PagenationStateLoading {
     static let shared = PagenationStateLoadingMore()
 }
 
-func abscractMethod() -> Swift.Never {
-    fatalError("Can't invoke an abscract method.")
-}
-
-class Pagenation<Element>: NSObject {
-    fileprivate (set) var contents = [Element]()
-    @objc dynamic var state: PagenationState = PagenationStateInitial.shared
+protocol PagenationProtocol: AnyObject {
+    associatedtype Element
+    
     typealias CompletionHandler = (Error?, [Element]?) -> Void
     typealias ElementLoader = (@escaping CompletionHandler) -> Void
+    
+    func reloadData(_ loader: ElementLoader)
+    
+    func loadMoreData(_ loader: ElementLoader)
+}
 
-    func reloadData(_ loader: ElementLoader) {
+class Pagenation<Element>: NSObject, PagenationProtocol {
+    var size: Int = 10
+    
+    var page: Int {
+        return contents.count % size
+    }
+    
+    var offset: Int {
+        return contents.count
+    }
+
+    fileprivate (set) var contents = [Element]()
+    var state: PagenationState = PagenationStateInitial.shared
+
+    func reloadData(_ loader: (@escaping (Error?, [Element]?) -> Void) -> Void) {
         state.reloadData(self, loader)
     }
     
-    func loadMoreData(_ loader: ElementLoader) {
+    func loadMoreData(_ loader: (@escaping (Error?, [Element]?) -> Void) -> Void) {
         state.loadMoreData(self, loader)
     }
 }

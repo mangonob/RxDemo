@@ -16,19 +16,106 @@ enum RuntimeError: Error {
     case loadError(String?)
 }
 
-class TableViewPagenation<Element: Equatable>: Pagenation<Element> {
-    private (set) weak var tableView: UITableView!
+class ScrollViewPagenation<Element>: Pagenation<Element> {
+    internal (set) weak var scrollView: UIScrollView!
     
-    init(_ tableView: UITableView) {
-        self.tableView = tableView
+    override var state: PagenationState {
+        didSet {
+            switch state {
+            case is PagenationStateError:
+                refreshHeader().endRefreshing()
+                refreshFooter().endRefreshing()
+            case is PagenationStateFetchedContents<Element>:
+                refreshHeader().endRefreshing()
+                refreshFooter().endRefreshing()
+            case is PagenationStateCompleted:
+                refreshHeader().endRefreshing()
+                refreshFooter().endRefreshingWithNoMoreData()
+            default: break
+            }
+        }
+    }
+    
+    func refreshHeader() -> MJRefreshHeader {
+        return scrollView.mj_header
+    }
+    
+    func refreshFooter() -> MJRefreshFooter {
+        return scrollView.mj_footer
+    }
+    
+    override func reloadData(_ loader: (@escaping (Error?, [Element]?) -> Void) -> Void) {
+        if state is PagenationStateLoading {
+            scrollView.mj_header.endRefreshing()
+        }
+        
+        super.reloadData(loader)
+    }
+    
+    override func loadMoreData(_ loader: (@escaping (Error?, [Element]?) -> Void) -> Void) {
+        if state is PagenationStateLoading {
+            scrollView.mj_footer.endRefreshing()
+        }
+        
+        super.loadMoreData(loader)
+    }
+
+    init(_ scrollView: UIScrollView) {
+        self.scrollView = scrollView
     }
 }
 
-class CollectionViewPagenation<Element: Equatable>: Pagenation<Element> {
-    private (set) weak var collectionView: UICollectionView!
+class TableViewPagenation<Element>: ScrollViewPagenation<Element> {
+    override var state: PagenationState {
+        didSet {
+            switch state {
+            case is PagenationStateFetchedContents<Element>:
+                tableView.reloadData()
+            case is PagenationStateCompleted:
+                tableView.reloadData()
+            default: break
+            }
+        }
+    }
+    
+    var tableView: UITableView! {
+        set {
+            scrollView = newValue
+        }
+        get {
+            return (scrollView as! UITableView)
+        }
+    }
+    
+    init(_ tableView: UITableView) {
+        super.init(tableView)
+    }
+}
+
+class CollectionViewPagenation<Element>: ScrollViewPagenation<Element> {
+    override var state: PagenationState {
+        didSet {
+            switch state {
+            case is PagenationStateFetchedContents<Element>:
+                collectionView.reloadData()
+            case is PagenationStateCompleted:
+                collectionView.reloadData()
+            default: break
+            }
+        }
+    }
+    
+    var collectionView: UICollectionView! {
+        set {
+            scrollView = newValue
+        }
+        get {
+            return (scrollView as! UICollectionView)
+        }
+    }
     
     init(_ collectionView: UICollectionView) {
-        self.collectionView = collectionView
+        super.init(collectionView)
     }
 }
 
@@ -37,58 +124,41 @@ class TableViewController: UITableViewController {
     @IBOutlet weak var contentsLabel: UITextField!
     
     fileprivate lazy var pagenation = TableViewPagenation<Int>.init(self.tableView)
+    private var disposeBag = DisposeBag()
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        tableView.mj_header = MJRefreshNormalHeader(refreshingBlock: { [weak self] in
-            guard !(self?.pagenation.state is PagenationStateLoading) else {
-                self?.tableView.mj_header.endRefreshing()
-                return
-            }
-            
-            self?.pagenation.reloadData({ (completion) in
-                DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(800), execute: {
-                    self?.tableView.mj_header.endRefreshing()
-                    
-                    if let errorDescription = self?.errorLabel.text,
-                        !errorDescription.isEmpty {
-                        completion(RuntimeError.loadError(errorDescription), nil)
-                        return
-                    }
+        tableView.mj_header = MJRefreshNormalHeader(refreshingTarget: nil, refreshingAction: nil)
+        tableView.mj_footer = MJRefreshAutoNormalFooter(refreshingTarget: nil, refreshingAction: nil)
 
-                    let contentsDescription = self?.contentsLabel.text
-                    let contents = contentsDescription?.split(separator: ".").compactMap { Int($0) } ?? []
-                    completion(nil, contents)
-                    self?.tableView.reloadData()
-                })
+        tableView.mj_header.rx.refreshing.bind(to: pagenation.rx.reloadData(loader: { [weak self] (completion) in
+            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(800), execute: {
+                if let errorDescription = self?.errorLabel.text,
+                    !errorDescription.isEmpty {
+                    completion(RuntimeError.loadError(errorDescription), nil)
+                    return
+                }
+                
+                let contentsDescription = self?.contentsLabel.text
+                let contents = contentsDescription?.split(separator: ".").compactMap { Int($0) } ?? []
+                completion(nil, contents)
             })
-        })
+        })).disposed(by: disposeBag)
         
-        tableView.mj_footer = MJRefreshAutoNormalFooter(refreshingBlock: { [weak self] in
-            guard !(self?.pagenation.state is PagenationStateLoading ||
-                self?.pagenation.state is PagenationStateCompleted) else {
-                self?.tableView.mj_footer.endRefreshing()
-                return
-            }
-            
-            self?.pagenation.loadMoreData({ (completion) in
-                DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(800), execute: {
-                    self?.tableView.mj_footer.endRefreshing()
-                    
-                    if let errorDescription = self?.errorLabel.text,
-                        !errorDescription.isEmpty {
-                        completion(RuntimeError.loadError(errorDescription), nil)
-                        return
-                    }
-                    
-                    let contentsDescription = self?.contentsLabel.text
-                    let contents = contentsDescription?.split(separator: ".").compactMap { Int($0) } ?? []
-                    completion(nil, contents)
-                    self?.tableView.reloadData()
-                })
+        tableView.mj_footer.rx.refreshing.bind(to: pagenation.rx.loadMoreData(loader: { [weak self] (completion) in
+            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(800), execute: {
+                if let errorDescription = self?.errorLabel.text,
+                    !errorDescription.isEmpty {
+                    completion(RuntimeError.loadError(errorDescription), nil)
+                    return
+                }
+                
+                let contentsDescription = self?.contentsLabel.text
+                let contents = contentsDescription?.split(separator: ".").compactMap { Int($0) } ?? []
+                completion(nil, contents)
             })
-        })
+        })).disposed(by: disposeBag)
     }
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
