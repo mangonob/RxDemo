@@ -16,7 +16,6 @@
 		4A093A9A21B52D4600C0E4C6 /* UIViewController+Instance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A093A9921B52D4600C0E4C6 /* UIViewController+Instance.swift */; };
 		4A093A9C21B52D5100C0E4C6 /* TestViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4A093A9B21B52D5100C0E4C6 /* TestViewController.storyboard */; };
 		4A6C27E421DF55300009C8CE /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A6C27E321DF55300009C8CE /* TableViewController.swift */; };
-		4A6C27E621DF55C60009C8CE /* Pagenation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A6C27E521DF55C60009C8CE /* Pagenation.swift */; };
 		4A7EEFED21B0364300DA5A53 /* RXActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A7EEFEC21B0364300DA5A53 /* RXActivity.swift */; };
 		4A81F78721E86DB600245F52 /* MJRefresh+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A81F78621E86DB600245F52 /* MJRefresh+Rx.swift */; };
 		4A83EB8821A6AD4D0055A385 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A83EB8721A6AD4D0055A385 /* AppDelegate.swift */; };
@@ -28,7 +27,6 @@
 		4A8FCF5B21AD3968001E3270 /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A8FCF5A21AD3968001E3270 /* LoginViewModel.swift */; };
 		4AAD95ED21B0DE8100425206 /* RDAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AAD95EC21B0DE8100425206 /* RDAccount.swift */; };
 		4AAD961B21B0E92A00425206 /* DataRequest+SwiftyJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AAD961A21B0E92A00425206 /* DataRequest+SwiftyJSON.swift */; };
-		4AE786E52230AFF000F375BE /* Pagenation+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AE786E42230AFF000F375BE /* Pagenation+Rx.swift */; };
 		4AFECDA5220044FD009129F0 /* SecureController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4AFECDA4220044FD009129F0 /* SecureController.storyboard */; };
 		4AFECDA722004510009129F0 /* SecureController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AFECDA622004510009129F0 /* SecureController.swift */; };
 		A1772A31334F2D76EF8F55DC /* Pods_RxDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F399A670B7B20A0C9F014187 /* Pods_RxDemo.framework */; };
@@ -45,7 +43,6 @@
 		4A093A9921B52D4600C0E4C6 /* UIViewController+Instance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+Instance.swift"; sourceTree = "<group>"; };
 		4A093A9B21B52D5100C0E4C6 /* TestViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = TestViewController.storyboard; sourceTree = "<group>"; };
 		4A6C27E321DF55300009C8CE /* TableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
-		4A6C27E521DF55C60009C8CE /* Pagenation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pagenation.swift; sourceTree = "<group>"; };
 		4A7EEFEC21B0364300DA5A53 /* RXActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RXActivity.swift; sourceTree = "<group>"; };
 		4A81F78621E86DB600245F52 /* MJRefresh+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MJRefresh+Rx.swift"; sourceTree = "<group>"; };
 		4A83EB8421A6AD4D0055A385 /* RxDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RxDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -59,7 +56,6 @@
 		4A8FCF5A21AD3968001E3270 /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
 		4AAD95EC21B0DE8100425206 /* RDAccount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RDAccount.swift; sourceTree = "<group>"; };
 		4AAD961A21B0E92A00425206 /* DataRequest+SwiftyJSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DataRequest+SwiftyJSON.swift"; sourceTree = "<group>"; };
-		4AE786E42230AFF000F375BE /* Pagenation+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Pagenation+Rx.swift"; sourceTree = "<group>"; };
 		4AFECDA4220044FD009129F0 /* SecureController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = SecureController.storyboard; sourceTree = "<group>"; };
 		4AFECDA622004510009129F0 /* SecureController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureController.swift; sourceTree = "<group>"; };
 		8DC7BB09DAD27029C68D9BEA /* Pods-RxDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RxDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-RxDemo/Pods-RxDemo.release.xcconfig"; sourceTree = "<group>"; };
@@ -99,8 +95,6 @@
 		4A83EB8621A6AD4D0055A385 /* RxDemo */ = {
 			isa = PBXGroup;
 			children = (
-				4A6C27E521DF55C60009C8CE /* Pagenation.swift */,
-				4AE786E42230AFF000F375BE /* Pagenation+Rx.swift */,
 				4A81F78621E86DB600245F52 /* MJRefresh+Rx.swift */,
 				4A6C27E321DF55300009C8CE /* TableViewController.swift */,
 				4A093A9721B52D2500C0E4C6 /* TestViewController.swift */,
@@ -325,7 +319,6 @@
 				4A6C27E421DF55300009C8CE /* TableViewController.swift in Sources */,
 				4A093A9021B4FCA300C0E4C6 /* RDOrderController.swift in Sources */,
 				4A093A8E21B4D39A00C0E4C6 /* JSON+Model.swift in Sources */,
-				4A6C27E621DF55C60009C8CE /* Pagenation.swift in Sources */,
 				4AAD961B21B0E92A00425206 /* DataRequest+SwiftyJSON.swift in Sources */,
 				4A093A9A21B52D4600C0E4C6 /* UIViewController+Instance.swift in Sources */,
 				4A093A9521B5216600C0E4C6 /* RDOrderCell.swift in Sources */,
@@ -334,7 +327,6 @@
 				4A093A9221B5214000C0E4C6 /* UITableView+NibLoadProtocol.swift in Sources */,
 				4AFECDA722004510009129F0 /* SecureController.swift in Sources */,
 				4A7EEFED21B0364300DA5A53 /* RXActivity.swift in Sources */,
-				4AE786E52230AFF000F375BE /* Pagenation+Rx.swift in Sources */,
 				4A8FCF5921AD3514001E3270 /* UIControl+UserStatus.swift in Sources */,
 				4A83EB8A21A6AD4D0055A385 /* ViewController.swift in Sources */,
 				4A093A9821B52D2500C0E4C6 /* TestViewController.swift in Sources */,
