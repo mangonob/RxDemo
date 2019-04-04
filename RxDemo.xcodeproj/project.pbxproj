@@ -15,6 +15,7 @@
 		4A093A9821B52D2500C0E4C6 /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A093A9721B52D2500C0E4C6 /* TestViewController.swift */; };
 		4A093A9A21B52D4600C0E4C6 /* UIViewController+Instance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A093A9921B52D4600C0E4C6 /* UIViewController+Instance.swift */; };
 		4A093A9C21B52D5100C0E4C6 /* TestViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4A093A9B21B52D5100C0E4C6 /* TestViewController.storyboard */; };
+		4A3D518C2256073C00A97A35 /* CCPagenator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A3D518B2256073C00A97A35 /* CCPagenator.swift */; };
 		4A6C27E421DF55300009C8CE /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A6C27E321DF55300009C8CE /* TableViewController.swift */; };
 		4A7EEFED21B0364300DA5A53 /* RXActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A7EEFEC21B0364300DA5A53 /* RXActivity.swift */; };
 		4A81F78721E86DB600245F52 /* MJRefresh+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A81F78621E86DB600245F52 /* MJRefresh+Rx.swift */; };
@@ -42,6 +43,7 @@
 		4A093A9721B52D2500C0E4C6 /* TestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
 		4A093A9921B52D4600C0E4C6 /* UIViewController+Instance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+Instance.swift"; sourceTree = "<group>"; };
 		4A093A9B21B52D5100C0E4C6 /* TestViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = TestViewController.storyboard; sourceTree = "<group>"; };
+		4A3D518B2256073C00A97A35 /* CCPagenator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCPagenator.swift; sourceTree = "<group>"; };
 		4A6C27E321DF55300009C8CE /* TableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
 		4A7EEFEC21B0364300DA5A53 /* RXActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RXActivity.swift; sourceTree = "<group>"; };
 		4A81F78621E86DB600245F52 /* MJRefresh+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MJRefresh+Rx.swift"; sourceTree = "<group>"; };
@@ -95,6 +97,7 @@
 		4A83EB8621A6AD4D0055A385 /* RxDemo */ = {
 			isa = PBXGroup;
 			children = (
+				4A3D518B2256073C00A97A35 /* CCPagenator.swift */,
 				4A81F78621E86DB600245F52 /* MJRefresh+Rx.swift */,
 				4A6C27E321DF55300009C8CE /* TableViewController.swift */,
 				4A093A9721B52D2500C0E4C6 /* TestViewController.swift */,
@@ -316,6 +319,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4A8FCF5B21AD3968001E3270 /* LoginViewModel.swift in Sources */,
+				4A3D518C2256073C00A97A35 /* CCPagenator.swift in Sources */,
 				4A6C27E421DF55300009C8CE /* TableViewController.swift in Sources */,
 				4A093A9021B4FCA300C0E4C6 /* RDOrderController.swift in Sources */,
 				4A093A8E21B4D39A00C0E4C6 /* JSON+Model.swift in Sources */,
